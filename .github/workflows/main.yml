@@ -19,8 +19,6 @@ jobs:
         if: ${{ success() || failure() }}
         run:
           echo Hello from job-1, step-1
-          echo "success=:${{ success() }}:"
-          echo "failure=:${{ failure() }}:"
 
   job-2:
     runs-on: ubuntu-latest
