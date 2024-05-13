@@ -38,5 +38,5 @@ jobs:
 #   job-2 runs? NO
 
 # plain exit-42 on job-1,step-1 and NO success()||failure() on job-1,step-2 means
-#   job-1,step-2 runs?
-#   job-2 runs?
+#   job-1,step-2 runs? NO
+#   job-2 runs? NO
