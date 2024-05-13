@@ -16,7 +16,7 @@ jobs:
           exit 42
 
       - name: step-2 from job-1
-        if: ${{ success() || failure() }}
+        # if: ${{ success() || failure() }}
         run:
           echo Hello from job-1, step-1
 
@@ -31,3 +31,6 @@ jobs:
       - name: step-2 from job-2
         run:
           echo Hello from job-2, step-2
+
+
+# plain exit-42 on job-1,step-1 and  success()||failure() on job-1,step-2 means job-2 DOES run
