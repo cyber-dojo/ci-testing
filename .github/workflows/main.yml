@@ -7,7 +7,7 @@ on:
 
 env:
   KOSLI_WIBBLE: "2.3"
-  # KOSLI_DRY_RUN: "false"
+  # KOSLI_DRY_RUN: false
 
 
 jobs:
@@ -20,7 +20,9 @@ jobs:
       - name: set-env-var in setup
         id: prepare
         run: |
-          if ${{ github.ref == 'refs/heads/main' }} ; then
+          if [ -n "${{ env.KOSLI_DRY_RUN }}" ] ; then
+            value="${{ env.KOSLI_DRY_RUN }}"
+          elif ${{ github.ref == 'refs/heads/main' }} ; then
             value=true
           else
             value=false
@@ -38,27 +40,6 @@ jobs:
         run: |
           echo Hello from job-1, step-1
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
-          echo ":${{ github.ref == 'refs/heads/master' }}:"      
-          if ${{ github.ref == 'refs/heads/main' }} ; then
-            echo we are inside the bald if
-            exit 25
-          else
-            echo we are inside the bald else
-            exit 24
-          fi
-
-          if [ "${{ github.ref == 'refs/heads/master' }}" == "false" ]; then
-            echo we are inside the if
-            exit 27
-          fi
-
-          if [ ${{ github.ref == 'refs/heads/master' }} ]; then
-            echo its-true
-            exit 28
-          else
-            echo its-false
-          fi
-          echo do we get here
           exit 42
 
       - name: step-2 from job-1
