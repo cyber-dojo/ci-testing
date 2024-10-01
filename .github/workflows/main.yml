@@ -16,8 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: set-env-var in setup
-        run:
-          echo KOSLI_DRY_RUN="$(${{ github.ref == 'refs/heads/main' }} && echo true || echo false)" >> $GITHUB_ENV
+        run: |
+          if ${{ github.ref == 'refs/heads/main' }} ; then
+            value=true
+          else
+            value=false
+          fi
+          echo "KOSLI_DRY_RUN=$(echo $value)" >> $GITHUB_ENV
 
 
   job-1:
@@ -25,7 +30,6 @@ jobs:
     needs: [ setup ]
     env:
       KOSLI_DRY_RUN: "${{ env.KOSLI_DRY_RUN }}"
-    # continue-on-error: true
     steps:
       - name: step-1 from job-1
         run: |
