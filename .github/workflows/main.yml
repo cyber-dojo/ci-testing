@@ -14,6 +14,7 @@ jobs:
         run: |
           echo Hello from job-1, step-1
           sdf
+          echo Hello from job-1, step-1, after an error
           exit 42
 
       - name: step-2 from job-1
