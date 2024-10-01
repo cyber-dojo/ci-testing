@@ -16,9 +16,11 @@ jobs:
           echo Hello from job-1, step-1
           if [ ${{ github.ref == 'refs/heads/master' }} ]; then
             echo its-true
+            exit 28
           else
             echo its-false
           fi
+          echo do we get here
           exit 42
 
       - name: step-2 from job-1
