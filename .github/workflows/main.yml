@@ -16,6 +16,10 @@ jobs:
           echo Hello from job-1, step-1
 
           echo ":${{ github.ref == 'refs/heads/master' }}:"      
+          if [ "${{ github.ref == 'refs/heads/master' }}" == "false" ]; then
+            echo we are inside the if
+            exit 27
+          else
 
           if [ ${{ github.ref == 'refs/heads/master' }} ]; then
             echo its-true
