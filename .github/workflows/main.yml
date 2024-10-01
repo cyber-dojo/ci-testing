@@ -14,24 +14,27 @@ jobs:
 
   setup:
     runs-on: ubuntu-latest
+    outputs:
+      kosli_dry_run: ${{ steps.prepare.outputs.kosli_dry_run }}
     steps:
       - name: set-env-var in setup
+        id: prepare
         run: |
           if ${{ github.ref == 'refs/heads/main' }} ; then
             value=true
           else
             value=false
           fi
-          echo "KOSLI_DRY_RUN=$(echo $value)" >> $GITHUB_ENV
+          echo "kosli_dry_run=$(echo $value)" >> ${GITHUB_OUTPUT}
 
 
   job-1:
     runs-on: ubuntu-latest
     needs: [ setup ]
+    env:
+      KOSLI_DRY_RUN: "${{ needs.setup.outputs.kosli_dry_run }}"
     steps:
       - name: step-1 from job-1
-        env:
-          KOSLI_DRY_RUN: "${{ env.KOSLI_DRY_RUN }}"
         run: |
           echo Hello from job-1, step-1
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
