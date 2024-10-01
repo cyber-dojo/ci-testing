@@ -13,8 +13,6 @@ jobs:
       - name: step-1 from job-1
         run: |
           echo Hello from job-1, step-1
-          sdf
-          echo Hello from job-1, step-1, after an error
           exit 42
 
       - name: step-2 from job-1
@@ -24,6 +22,7 @@ jobs:
 
   job-2:
     runs-on: ubuntu-latest
+    if: ${{ success() || failure() }}
     needs: [ job-1 ]
     steps:
       - name: step-1 from job-2
@@ -42,3 +41,20 @@ jobs:
 # plain exit-42 on job-1,step-1 and NO success()||failure() on job-1,step-2 means
 #   job-1,step-2 runs? NO
 #   job-2 runs? NO
+
+# With this...
+#      - name: step-1 from job-1
+#        run: |
+#          echo Hello from job-1, step-1
+#          sdf
+#          echo Hello from job-1, step-1, after an error
+#          exit 42
+# then
+# the second echo is NOT run, and the exit code of the job is 127 (not 42)
+
+# With this...
+#  job-2:
+#    runs-on: ubuntu-latest
+#    if: ${{ success() || failure() }}
+# then
+#
