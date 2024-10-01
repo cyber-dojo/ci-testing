@@ -27,10 +27,10 @@ jobs:
             value="${{ env.KOSLI_DRY_RUN }}"
           elif ${{ github.ref == 'refs/heads/main' }} ; then
             echo setting value in elif
-            value=true
+            value=false
           else
             echo setting value in else          
-            value=false
+            value=true
           fi
           echo "kosli_dry_run=$(echo $value)" >> ${GITHUB_OUTPUT}
 
