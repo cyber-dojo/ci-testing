@@ -16,6 +16,14 @@ jobs:
           echo Hello from job-1, step-1
 
           echo ":${{ github.ref == 'refs/heads/master' }}:"      
+          if ${{ github.ref == 'refs/heads/main' }} ; then
+            echo we are inside the bald if
+            exit 25
+          else
+            echo we are inside the bald else
+            exit 24
+          fi
+
           if [ "${{ github.ref == 'refs/heads/master' }}" == "false" ]; then
             echo we are inside the if
             exit 27
