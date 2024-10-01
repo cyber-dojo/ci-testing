@@ -17,7 +17,7 @@ jobs:
           exit 42
 
       - name: step-2 from job-1
-        if: "(success() || failure())"
+        if: "(success() || failure()) && (github.ref == 'refs/heads/master')"
         run:
           echo Hello from job-1, step-2
           exit 43
