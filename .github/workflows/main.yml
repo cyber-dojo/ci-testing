@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: step-1 from job-1
-        continue-on-error: true
         run: |
           echo Hello from job-1, step-1
           exit 42
@@ -32,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     # if: ${{ success() || failure() }}
     needs: [ job-1 ]
+    continue-on-error: true
     steps:
       - name: step-1 from job-2
         run:
@@ -66,3 +66,9 @@ jobs:
 #    if: ${{ success() || failure() }}
 # then
 # job1 failed, job2 waits for job1 to finish, and does then run.
+
+# Putting continue-on-error: true
+# at the step level, means that if the step fails
+# the other steps still run, and the job succeeds
+# Eg, there is no "Rerun failed jobs" option in the CI.
+
