@@ -6,7 +6,9 @@ on:
       - main
 
 env:
-  KOSLI_WIBBLE: "2.3"
+  KOSLI_ORG: kosli
+  KOSLI_FLOW: server
+  KOSLI_CLI_VERSION: 2.10.16
   KOSLI_DRY_RUN: false
 
 
@@ -21,10 +23,13 @@ jobs:
         id: prepare
         run: |
           if [ -n "${{ env.KOSLI_DRY_RUN }}" ] ; then
+            echo setting value in if
             value="${{ env.KOSLI_DRY_RUN }}"
           elif ${{ github.ref == 'refs/heads/main' }} ; then
+            echo setting value in elif
             value=true
           else
+            echo setting value in else          
             value=false
           fi
           echo "kosli_dry_run=$(echo $value)" >> ${GITHUB_OUTPUT}
@@ -36,23 +41,25 @@ jobs:
     env:
       KOSLI_DRY_RUN: "${{ needs.setup.outputs.kosli_dry_run }}"
     steps:
-      - name: step-1 from job-1
+      - name: Setup Kosli cli
+        uses: kosli-dev/setup-cli-action@v2
+        with:
+          version:
+            ${{ env.KOSLI_CLI_VERSION }}
+
+      - name: Do something
         run: |
-          echo Hello from job-1, step-1
+          set +e
+          werwer
+          STATUS=$?
+          set -e
+          exit $STATUS
+
+      - name: When on master, attest result to Kosli
+        if: "(success() || failure())"
+        run:
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
-          exit 42
 
-      - name: step-2 from job-1
-        if: "(success() || failure()) && (github.ref == 'refs/heads/main')"
-        run:
-          echo Hello from job-1, step-2
-          exit 43
-
-      - name: step-3 from job-1
-        if: ${{ success() || failure() }}
-        run:
-          echo Hello from job-1, step-3
-          exit 44
 
   job-2:
     runs-on: ubuntu-latest
