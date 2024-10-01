@@ -9,6 +9,7 @@ jobs:
 
   job-1:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: step-1 from job-1
         run: |
@@ -31,7 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     # if: ${{ success() || failure() }}
     needs: [ job-1 ]
-    continue-on-error: true
     steps:
       - name: step-1 from job-2
         run:
@@ -72,3 +72,9 @@ jobs:
 # the other steps still run, and the job succeeds
 # Eg, there is no "Rerun failed jobs" option in the CI.
 
+# Putting continue-on-error: true
+# at the job-2 level, seems to have no effect.
+# job1 fails, but job2 is not run (it is skipped)
+
+# Putting continue-on-error: true
+# at the job-1 level
