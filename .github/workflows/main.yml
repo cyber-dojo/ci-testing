@@ -7,7 +7,7 @@ on:
 
 env:
   KOSLI_WIBBLE: "2.3"
-  # KOSLI_DRY_RUN: false
+  KOSLI_DRY_RUN: false
 
 
 jobs:
