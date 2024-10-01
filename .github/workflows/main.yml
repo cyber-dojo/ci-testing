@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  KOSLI_DRY_RUN: "${{ github.ref == 'refs/heads/main' }}"
+
+
 jobs:
 
   job-1:
@@ -14,7 +18,7 @@ jobs:
       - name: step-1 from job-1
         run: |
           echo Hello from job-1, step-1
-
+          echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
           echo ":${{ github.ref == 'refs/heads/master' }}:"      
           if ${{ github.ref == 'refs/heads/main' }} ; then
             echo we are inside the bald if
