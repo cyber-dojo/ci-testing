@@ -91,3 +91,5 @@ jobs:
 # at the job-1 level, means that job1 steps 2,3 are not run.
 # and job-1 fails, and job-2 is run.
 
+# env-var added to >> ${GITHUB_ENV}
+# is available in the next step (in the same job)
