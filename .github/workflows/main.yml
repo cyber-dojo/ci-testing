@@ -43,10 +43,13 @@ jobs:
       - name: step-1 from job-2
         run:
           echo Hello from job-2, step-1
+          echo "TEST_UNIT_COVERAGE_IS_COMPLIANT=wibble" >> ${GITHUB_ENV}
 
       - name: step-2 from job-2
         run:
           echo Hello from job-2, step-2
+          echo "env-var=:${{ env.TEST_UNIT_COVERAGE_IS_COMPLIANT }}:"
+        
 
 
 # plain exit-42 on job-1,step-1 and success()||failure() on job-1,step-2 means
