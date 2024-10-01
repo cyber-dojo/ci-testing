@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  KOSLI_DRY_RUN: "${{ github.ref == 'refs/heads/main' }}"
+  KOSLI_DRY_RUN: "if ${{ github.ref == 'refs/heads/main' }} ; then echo True; else echo False; fi"
 
 
 jobs:
