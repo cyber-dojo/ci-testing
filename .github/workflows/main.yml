@@ -38,26 +38,25 @@ jobs:
   job-1:
     runs-on: ubuntu-latest
     needs: [ setup ]
-    env:
-      KOSLI_DRY_RUN: "${{ needs.setup.outputs.kosli_dry_run }}"
     steps:
       - name: Setup Kosli cli
+        if: "(success() || failure())"
         uses: kosli-dev/setup-cli-action@v2
         with:
           version:
             ${{ env.KOSLI_CLI_VERSION }}
 
       - name: Do something
-        run: |
-          set +e
-          werwer
-          STATUS=$?
-          set -e
-          exit $STATUS
+        run:
+          echo Doing something...
+          exit 27
 
       - name: When on master, attest result to Kosli
         if: "(success() || failure())"
+        env:
+          KOSLI_DRY_RUN: "${{ needs.setup.outputs.kosli_dry_run }}"
         run:
+          # Here we do 'kosli attest ..."
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
 
 
