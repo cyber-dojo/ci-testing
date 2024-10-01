@@ -13,6 +13,7 @@ jobs:
       - name: step-1 from job-1
         run: |
           echo Hello from job-1, step-1
+          sdf
           exit 42
 
       - name: step-2 from job-1
