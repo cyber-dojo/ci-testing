@@ -9,7 +9,7 @@ env:
   KOSLI_ORG: kosli
   KOSLI_FLOW: server
   KOSLI_CLI_VERSION: 2.10.16
-  # KOSLI_DRY_RUN: true
+  # KOSLI_DRY_RUN: true    # local override
 
 
 jobs:
@@ -22,14 +22,20 @@ jobs:
       - name: set-env-var in setup
         id: prepare
         run: |
-          if [ -n "${{ env.KOSLI_DRY_RUN }}" ] ; then
-            echo setting value in if
+          if [ "${{ vars.KOSLI_DRY_RUN }}" == 'true' ] ; then
+            echo Org level KOSLI_DRY_RUN=true
+            value=true
+          elif [ "${{ vars.KOSLI_DRY_RUN }}" == 'false' ] ; then
+            echo Org level KOSLI_DRY_RUN=false
+            value=false
+          elif [ -n "${{ env.KOSLI_DRY_RUN }}" ] ; then
+            echo Repo level KOSLI_DRY_RUN=true          
             value="${{ env.KOSLI_DRY_RUN }}"
-          elif ${{ github.ref == 'refs/heads/main' }} ; then
-            echo setting value in elif
+          elif [ "${{ github.ref }}" == 'refs/heads/main' ] ; then
+            echo Branch level KOSLI_DRY_RUN=false          
             value=false
           else
-            echo setting value in else          
+            echo Default KOSLI_DRY_RUN=true          
             value=true
           fi
           echo "kosli_dry_run=$(echo $value)" >> ${GITHUB_OUTPUT}
@@ -38,23 +44,23 @@ jobs:
   job-1:
     runs-on: ubuntu-latest
     needs: [ setup ]
+    env:
+      KOSLI_DRY_RUN: ${{ needs.setup.outputs.kosli_dry_run }}
     steps:
       - name: Do something
         run:
           exit 27
 
-      - name: Setup Kosli cli
-        if: "(success() || failure())"
-        uses: kosli-dev/setup-cli-action@v2
-        with:
-          version:
-            ${{ env.KOSLI_CLI_VERSION }}
+#      - name: Setup Kosli cli
+#        if: success() || failure()
+#        uses: kosli-dev/setup-cli-action@v2
+#        with:
+#          version:
+#            ${{ env.KOSLI_CLI_VERSION }}
 
       - name: When on master, attest result to Kosli
-        if: "(success() || failure())"
-        env:
-          KOSLI_DRY_RUN: "${{ needs.setup.outputs.kosli_dry_run }}"
-        run:
+        if: success() || failure()
+        run: |
           # Here we do 'kosli attest ..."
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
 
