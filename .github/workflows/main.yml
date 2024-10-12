@@ -9,7 +9,7 @@ env:
   KOSLI_ORG: kosli
   KOSLI_FLOW: server
   KOSLI_CLI_VERSION: 2.10.16
-  # KOSLI_DRY_RUN: true    # local override
+  KOSLI_DRY_RUN: true    # local override
 
 
 jobs:
