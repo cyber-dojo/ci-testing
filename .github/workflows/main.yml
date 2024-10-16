@@ -46,8 +46,8 @@ jobs:
     env:
       KOSLI_DRY_RUN: ${{ needs.setup.outputs.kosli_dry_run }}
     steps:
-      - name: Do something
-        id: something
+      - name: Do wibble
+        id: wibble
         run:
           exit 0
 
@@ -65,9 +65,9 @@ jobs:
           set +e
           # Here we do 'kosli attest ..."
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
-          KOSLI_COMPLIANT=$([ "${{ steps.something.outcome }}" == 'success' ] && echo true || echo false)
+          KOSLI_COMPLIANT=$([ "${{ steps.wibble.outcome }}" == 'success' ] && echo true || echo false)
           echo "KOSLI_COMPLIANT=:${KOSLI_COMPLIANT}:"
-          kosli attest generic 
+          kosli attest generic --name=wibble
 
 
   job-2:
