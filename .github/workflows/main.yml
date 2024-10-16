@@ -11,7 +11,7 @@ env:
   KOSLI_FLOW: server
   KOSLI_TRAIL: ${{ github.sha }}
   KOSLI_CLI_VERSION: 2.10.18
-  KOSLI_DRY_RUN: ${{ vars.KOSLI_DRY_RUN }} || false
+  KOSLI_DRY_RUN: ${{ vars.KOSLI_DRY_RUN }}
 
 
 jobs:
