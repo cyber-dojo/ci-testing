@@ -41,14 +41,14 @@ jobs:
           exit 0
 
       - name: Setup Kosli cli
-        if: "${{ github.ref }}" == 'refs/heads/main' && (success() || failure())
+        if: ${{ github.ref }} == 'refs/heads/main' && (success() || failure())
         uses: kosli-dev/setup-cli-action@v2
         with:
           version:
             ${{ env.KOSLI_CLI_VERSION }}
 
       - name: When on master, attest result to Kosli
-        if: "${{ github.ref }}" == 'refs/heads/main' && (success() || failure())
+        if: ${{ github.ref }} == 'refs/heads/main' && (success() || failure())
         run: |
           echo "KOSLI_DRY_RUN=:${KOSLI_DRY_RUN}:"
           KOSLI_COMPLIANT=$([ "${{ steps.wibble.outcome }}" == 'success' ] && echo true || echo false)
