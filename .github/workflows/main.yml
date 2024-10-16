@@ -48,7 +48,7 @@ jobs:
       - name: Do something
         id: something
         run:
-          exit 27
+          exit 0
 
       - name: Setup Kosli cli
         if: success() || failure()
