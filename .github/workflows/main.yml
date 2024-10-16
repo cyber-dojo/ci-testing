@@ -60,14 +60,13 @@ jobs:
       - name: When on master, attest result to Kosli
         if: success() || failure()
         continue-on-error: true
-        env:
-          KOSLI_COMPLIANT2: $([ "${{ steps.something.outcome }}" == 'success' ] && echo true || echo false)
         run: |
           set +e
           # Here we do 'kosli attest ..."
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
-          echo "KOSLI_COMPLIANT=$([ "${{ steps.something.outcome }}" == 'success' ] && echo true || echo false)"
-          here we make a mistake
+          KOSLI_COMPLIANT=$([ "${{ steps.something.outcome }}" == 'success' ] && echo true || echo false)
+          echo "KOSLI_COMPLIANT=:${KOSLI_COMPLIANT}:"
+          kosli attest generic
 
 
   job-2:
