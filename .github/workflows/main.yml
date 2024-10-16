@@ -59,6 +59,7 @@ jobs:
 
       - name: When on master, attest result to Kosli
         if: success() || failure()
+        continue-on-error: true
         run: |
           set +e
           # Here we do 'kosli attest ..."
