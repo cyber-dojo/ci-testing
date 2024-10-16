@@ -7,6 +7,7 @@ on:
 
 env:
   KOSLI_ORG: kosli
+  KOSLI_API_TOKEN: dummy3465324sgr65324wrets
   KOSLI_FLOW: server
   KOSLI_TRAIL: ${{ github.sha }}
   KOSLI_CLI_VERSION: 2.10.18
@@ -66,7 +67,7 @@ jobs:
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
           KOSLI_COMPLIANT=$([ "${{ steps.something.outcome }}" == 'success' ] && echo true || echo false)
           echo "KOSLI_COMPLIANT=:${KOSLI_COMPLIANT}:"
-          kosli attest generic
+          kosli attest generic 
 
 
   job-2:
