@@ -46,6 +46,10 @@ jobs:
     env:
       KOSLI_DRY_RUN: ${{ needs.setup.outputs.kosli_dry_run }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Do wibble
         id: wibble
         run:
