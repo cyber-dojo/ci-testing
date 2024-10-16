@@ -11,7 +11,7 @@ env:
   KOSLI_FLOW: server
   KOSLI_TRAIL: ${{ github.sha }}
   KOSLI_CLI_VERSION: 2.10.18
-  KOSLI_DRY_RUN: true    # Repo override
+  KOSLI_DRY_RUN: ${{ vars.KOSLI_DRY_RUN }} || false
 
 
 jobs:
@@ -23,28 +23,13 @@ jobs:
     steps:
       - name: set-env-var in setup
         id: prepare
-        run: |
-          if [ "${{ vars.KOSLI_DRY_RUN }}" == 'true' ] ; then
-            echo Org level KOSLI_DRY_RUN=true
-            value=true
-          elif [ -n "${{ env.KOSLI_DRY_RUN }}" ] ; then
-            echo Repo level KOSLI_DRY_RUN=true          
-            value="${{ env.KOSLI_DRY_RUN }}"
-          elif [ "${{ github.ref }}" == 'refs/heads/main' ] ; then
-            echo Branch level KOSLI_DRY_RUN=false          
-            value=false
-          else
-            echo Default KOSLI_DRY_RUN=true          
-            value=true
-          fi
-          echo "kosli_dry_run=$(echo $value)" >> ${GITHUB_OUTPUT}
+        run:
+          echo Hello
 
 
   job-1:
     runs-on: ubuntu-latest
     needs: [ setup ]
-    env:
-      KOSLI_DRY_RUN: ${{ needs.setup.outputs.kosli_dry_run }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,19 +41,16 @@ jobs:
           exit 0
 
       - name: Setup Kosli cli
-        if: success() || failure()
+        if: ${{ github.ref }}" == 'refs/heads/main' && (success() || failure())
         uses: kosli-dev/setup-cli-action@v2
         with:
           version:
             ${{ env.KOSLI_CLI_VERSION }}
 
       - name: When on master, attest result to Kosli
-        if: success() || failure()
-        continue-on-error: true
+        if: ${{ github.ref }}" == 'refs/heads/main' && (success() || failure())
         run: |
-          set +e
-          # Here we do 'kosli attest ..."
-          echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
+          echo "KOSLI_DRY_RUN=:${KOSLI_DRY_RUN}:"
           KOSLI_COMPLIANT=$([ "${{ steps.wibble.outcome }}" == 'success' ] && echo true || echo false)
           echo "KOSLI_COMPLIANT=:${KOSLI_COMPLIANT}:"
           kosli attest generic --name=wibble
