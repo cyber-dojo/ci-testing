@@ -60,6 +60,8 @@ jobs:
       - name: When on master, attest result to Kosli
         if: success() || failure()
         continue-on-error: true
+        env:
+          KOSLI_COMPLIANT2: $([ "${{ steps.something.outcome }}" == 'success' ] && echo true || echo false)
         run: |
           set +e
           # Here we do 'kosli attest ..."
