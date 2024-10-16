@@ -8,8 +8,9 @@ on:
 env:
   KOSLI_ORG: kosli
   KOSLI_FLOW: server
-  KOSLI_CLI_VERSION: 2.10.16
-  KOSLI_DRY_RUN: true    # local override
+  KOSLI_TRAIL: ${{ github.sha }}
+  KOSLI_CLI_VERSION: 2.10.18
+  KOSLI_DRY_RUN: true    # Repo override
 
 
 jobs:
@@ -25,9 +26,6 @@ jobs:
           if [ "${{ vars.KOSLI_DRY_RUN }}" == 'true' ] ; then
             echo Org level KOSLI_DRY_RUN=true
             value=true
-          elif [ "${{ vars.KOSLI_DRY_RUN }}" == 'false' ] ; then
-            echo Org level KOSLI_DRY_RUN=false
-            value=false
           elif [ -n "${{ env.KOSLI_DRY_RUN }}" ] ; then
             echo Repo level KOSLI_DRY_RUN=true          
             value="${{ env.KOSLI_DRY_RUN }}"
@@ -48,21 +46,24 @@ jobs:
       KOSLI_DRY_RUN: ${{ needs.setup.outputs.kosli_dry_run }}
     steps:
       - name: Do something
+        id: something
         run:
           exit 27
 
-#      - name: Setup Kosli cli
-#        if: success() || failure()
-#        uses: kosli-dev/setup-cli-action@v2
-#        with:
-#          version:
-#            ${{ env.KOSLI_CLI_VERSION }}
+      - name: Setup Kosli cli
+        if: success() || failure()
+        uses: kosli-dev/setup-cli-action@v2
+        with:
+          version:
+            ${{ env.KOSLI_CLI_VERSION }}
 
       - name: When on master, attest result to Kosli
         if: success() || failure()
         run: |
           # Here we do 'kosli attest ..."
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
+          echo "KOSLI_COMPLIANT=:${{ steps.something.outcome }}:"
+          here we make a mistake
 
 
   job-2:
