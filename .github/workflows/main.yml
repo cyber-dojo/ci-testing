@@ -63,7 +63,7 @@ jobs:
           set +e
           # Here we do 'kosli attest ..."
           echo "KOSLI_DRY_RUN=:${{ env.KOSLI_DRY_RUN }}:"
-          echo "KOSLI_COMPLIANT=$("${{ steps.something.outcome }}" == 'success' && echo true || echo false)"
+          echo "KOSLI_COMPLIANT=$([ "${{ steps.something.outcome }}" == 'success' ] && echo true || echo false)"
           here we make a mistake
 
 
