@@ -14,9 +14,25 @@ env:
 
 jobs:
 
+  short-sha:
+    runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.variable.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set outputs
+        id: variable
+        run:
+          echo "value=${GITHUB_SHA:0:7}" >> ${GITHUB_OUTPUT}
+
   job-1:
     runs-on: ubuntu-latest
-    needs: []
+    needs: [short-sha]
+    env:
+      SHORT_SHA: ${{ needs.short-sha.outputs.value }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,8 +40,6 @@ jobs:
 
       - name: Do wibble
         id: wibble
-        env:
-          SHORT_SHA: ${GITHUB_SHA:0:7}
         run:
           echo "SHORT_SHA=:${SHORT_SHA}:"
           exit 0
