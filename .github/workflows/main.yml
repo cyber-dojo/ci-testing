@@ -15,6 +15,7 @@ env:
 
 jobs:
 
+  # You cannot do ${{ github.sha }}:0:7 so creating a job to get the short-sha
   short-sha:
     runs-on: ubuntu-latest
     outputs:
@@ -34,10 +35,10 @@ jobs:
     needs: [short-sha]
     env:
       IMAGE_TAG: ${{ needs.short-sha.outputs.value }}
-      IMAGE_NAME: cyberdojo/dashboard:${{ needs.short-sha.outputs.value }}
+      IMAGE_NAME: cyberdojo/${{ env.SERVICE_NAME }}:${{ needs.short-sha.outputs.value }}
     outputs:
+      tag: ${{ steps.variables.outputs.tag }}
       name: ${{ steps.variables.outputs.name }}
-      tag: ${{ needs.short-sha.outputs.value }}
       fingerprint: ${{ steps.variables.outputs.fingerprint }}
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +47,7 @@ jobs:
 
       - name: Do wibble
         id: wibble
-        run:
+        run: |
           echo "IMAGE_TAG=:${IMAGE_TAG}:"
           echo "IMAGE_NAME=:${IMAGE_NAME}:"
           exit 0
@@ -72,6 +73,7 @@ jobs:
           FINGERPRINT=ce707b630a5602097df22253e80a6305b46340b354f27776f45fc2a2688522b4
           echo "fingerprint=${FINGERPRINT}" >> ${GITHUB_OUTPUT}
           SHORT_SHA=${{ needs.short-sha.outputs.value }}
+          echo "tag=${SHORT_SHA}" >> ${GITHUB_OUTPUT}
           echo "name=cyberdojo/dashboard:${SHORT_SHA}" >> ${GITHUB_OUTPUT}
 
 
