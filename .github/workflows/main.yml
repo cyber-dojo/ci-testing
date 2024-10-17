@@ -35,7 +35,7 @@ jobs:
     needs: [short-sha]
     env:
       IMAGE_TAG: ${{ needs.short-sha.outputs.value }}
-      IMAGE_NAME: cyberdojo/${{ env.SERVICE_NAME }}:${{ needs.short-sha.outputs.value }}
+      IMAGE_NAME: cyberdojo/dashboard:${{ needs.short-sha.outputs.value }}
     outputs:
       tag: ${{ steps.variables.outputs.tag }}
       name: ${{ steps.variables.outputs.name }}
