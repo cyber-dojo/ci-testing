@@ -41,9 +41,17 @@ jobs:
       name: ${{ steps.variables.outputs.name }}
       fingerprint: ${{ steps.variables.outputs.fingerprint }}
     steps:
+      - name: check branch condition before checkout
+        run: |
+          echo ":${{ github.ref }}:"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: check branch condition after checkout
+        run: |
+          echo ":${{ github.ref }}:"
 
       - name: Do wibble
         id: wibble
