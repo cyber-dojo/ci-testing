@@ -58,7 +58,7 @@ jobs:
         run: |
           echo "IMAGE_TAG=:${IMAGE_TAG}:"
           echo "IMAGE_NAME=:${IMAGE_NAME}:"
-          exit 0
+          exit 23
 
       - name: Setup Kosli cli
         if: ${{ github.ref == 'refs/heads/main' && (success() || failure()) }}
