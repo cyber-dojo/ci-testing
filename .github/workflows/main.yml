@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [short-sha]
     env:
-      IMAGE_NAME: cyberdojo/${{ env.SERVICE_NAME }}:${{ needs.short-sha.outputs.value }}
+      IMAGE_NAME: cyberdojo/${SERVICE_NAME}:${{ needs.short-sha.outputs.value }}
     outputs:
       name: ${IMAGE_NAME}
       tag: ${{ needs.short-sha.outputs.value }}
