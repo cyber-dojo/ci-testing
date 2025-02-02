@@ -54,5 +54,5 @@ jobs:
         run: |
           DIGEST=$(echo ${{ steps.docker_build.outputs.digest }} | sed 's/.*://')          
           echo "digest=${DIGEST}"
-          echo "${IMAGE_NAME}:${IMAGE_TAG}@${DIGEST}"
-          docker pull "${IMAGE_NAME}:${IMAGE_TAG}@${DIGEST}"
+          echo "${IMAGE_NAME}:${IMAGE_TAG}@sha256:${DIGEST}"
+          docker pull "${IMAGE_NAME}:${IMAGE_TAG}@sha256:${DIGEST}"
