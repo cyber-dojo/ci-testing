@@ -6,7 +6,7 @@ on:
 jobs:
 
   setup:
-    # runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     outputs:
       image_name: ${{ steps.vars.outputs.image_name }}
       image_tag:  ${{ steps.vars.outputs.image_tag }}
