@@ -5,7 +5,7 @@ on:
 
 jobs:
 
-  generate-deploy-matrix:
+  generate-matrix:
     name: Generate Job Matrix
     runs-on: ubuntu-latest
     outputs:
@@ -17,12 +17,11 @@ jobs:
           json="{\"include\": [{\"service\": \"alpha\"},{\"service\": \"beta\"}]}"
           echo "matrix=${json}" >> ${GITHUB_OUTPUT}
 
-
-  deploy-all:
-    needs: [generate-deploy-matrix]
-    name: Deploy all
+  deploy-one:
+    needs: [generate-matrix]
+    name: Check
     runs-on: ubuntu-latest
-    if: needs.generate-matrix.outputs.matrix != '[]'
+    if: needs.generate-matrix.outputs.matrix != ''
     strategy:
       fail-fast: false
       max-parallel: 6
@@ -40,10 +39,3 @@ jobs:
 #      - run:
 #          echo "Got to here"
 
-
-
-#const matrixList = ['package-a', 'package-b', 'package-c'].map((pkg) => ({
-#  package: pkg,
-#}));
-#const includeStatement = { include: matrixList };
-#console.log(`::set-output name=matrix::${includeStatement}`);
