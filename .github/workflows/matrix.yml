@@ -15,18 +15,25 @@ jobs:
         id: set-matrix
         run: |
           json="{\"includes\": [{\"service\": \"alpha\"},{\"service\": \"beta\"}]}"
-          echo "matrix=${json}" >> ${GITHUB_OUTPUT}
+          echo "matrix=matrix::${json}" >> ${GITHUB_OUTPUT}
 
   deploy-one:
     needs: [generate-matrix]
     name: Check
     runs-on: ubuntu-latest
-    if: needs.generate-matrix.outputs.matrix != '[]'
+    if: needs.generate-matrix.outputs.matrix != ''
     strategy:
       fail-fast: false
       max-parallel: 6
-      matrix: ${{fromJSON(needs.generate-matrix.outputs.matrix)}}
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
 
     steps:
       - run:
           echo "deploy :${{ matrix.service }}:"
+
+
+#const matrixList = ['package-a', 'package-b', 'package-c'].map((pkg) => ({
+#  package: pkg,
+#}));
+#const includeStatement = { include: matrixList };
+#console.log(`::set-output name=matrix::${includeStatement}`);
