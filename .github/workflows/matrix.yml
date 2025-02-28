@@ -5,8 +5,7 @@ on:
 
 jobs:
 
-  generate-matrix:
-    name: Generate Job Matrix
+  generate-deploy-matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -17,19 +16,32 @@ jobs:
           json="{\"include\": [{\"service\": \"alpha\"},{\"service\": \"beta\"}]}"
           echo "matrix=${json}" >> ${GITHUB_OUTPUT}
 
-  deploy-one:
-    needs: [generate-matrix]
-    name: Check
+  deploy-all:
+    needs: [generate-deploy-matrix]
     runs-on: ubuntu-latest
     if: needs.generate-matrix.outputs.matrix != ''
     strategy:
       fail-fast: false
-      max-parallel: 6
+      max-parallel: 10
       matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
 
     steps:
-      - run:
+      - run: |
           echo "deploy :${{ matrix.service }}:"
+          if [ "${{ matrix.service }}" == "alpha" ]; then
+            exit 42
+          else
+            exit 0
+          fi
+
+
+  result:
+    needs: [deploy-all]
+    runs-on: ubuntu-latest
+    steps:
+      - run:
+          echo "Got to here"
+
 
 
 #const matrixList = ['package-a', 'package-b', 'package-c'].map((pkg) => ({
