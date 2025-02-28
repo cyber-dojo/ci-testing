@@ -13,8 +13,9 @@ jobs:
     steps:
       - name: Generate matrix
         id: set-matrix
-        run:
-          echo "matrix=['alpha', 'beta']" >> ${GITHUB_OUTPUT}
+        run: |
+          json="{\"includes\": [{\"service\": \"alpha\"},{\"service\": \"alpha\"}]}'
+          echo "matrix=${json}" >> ${GITHUB_OUTPUT}
 
   deploy-one:
     needs: [generate-matrix]
