@@ -28,5 +28,5 @@ jobs:
 
     steps:
       - name: One run
-      - run:
+        run:
           echo "deploy :${{ matrix.package }}:"
