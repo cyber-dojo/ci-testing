@@ -1,0 +1,32 @@
+name: Main
+
+on:
+  push:
+
+jobs:
+
+  generate-matrix:
+    name: Generate Job Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Generate matrix
+        id: set-matrix
+      - run:
+          echo "matrix=['alpha', 'beta']" >> ${GITHUB_OUTPUT}
+
+  deploy-one:
+    needs: [generate-matrix]
+    name: Check
+    runs-on: ubuntu-latest
+    if: needs.generate-matrix.outputs.matrix != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{fromJSON(needs.generate-matrix.outputs.matrix)}}
+
+    steps:
+      - name: One run
+      - run:
+          echo "deploy :${{ matrix.package }}:"
