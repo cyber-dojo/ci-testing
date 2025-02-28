@@ -26,8 +26,13 @@ jobs:
       matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
 
     steps:
-      - run:
+      - run: |
           echo "deploy :${{ matrix.service }}:"
+          if [ "${{ matrix.service }}" == "alpha" ]; then
+            return 0
+          else
+            return 1
+          fi
 
 
   result:
