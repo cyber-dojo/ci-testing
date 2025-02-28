@@ -6,6 +6,7 @@ on:
 jobs:
 
   generate-deploy-matrix:
+    name: Generate Job Matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -19,8 +20,9 @@ jobs:
 
   deploy-all:
     needs: [generate-deploy-matrix]
+    name: Deploy all
     runs-on: ubuntu-latest
-    if: needs.generate-matrix.outputs.matrix != ''
+    if: needs.generate-matrix.outputs.matrix != '[]'
     strategy:
       fail-fast: false
       max-parallel: 6
@@ -31,12 +33,12 @@ jobs:
           echo "deploy :${{ matrix.service }}:"
 
 
-  result:
-    needs: [deploy-all]
-    runs-on: ubuntu-latest
-    steps:
-      - run:
-          echo "Got to here"
+#  result:
+#    needs: [deploy-all]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - run:
+#          echo "Got to here"
 
 
 
