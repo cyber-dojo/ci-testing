@@ -27,6 +27,5 @@ jobs:
       matrix: ${{fromJSON(needs.generate-matrix.outputs.matrix)}}
 
     steps:
-      - name: One run
-        run:
+      - run:
           echo "deploy :${{ matrix.package }}:"
