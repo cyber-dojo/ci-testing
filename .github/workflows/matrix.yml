@@ -12,10 +12,12 @@ jobs:
       matrix_include: ${{ steps.generate.outputs.matrix_include }}
     env:
       JSON: >-
-        [
-          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
-          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
-        ]
+        []
+#      JSON: >-
+#        [
+#          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
+#          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
+#        ]
     steps:
       - name: Generate matrix-include
         id: generate
@@ -26,7 +28,7 @@ jobs:
     needs: [setup]
     name: Check
     runs-on: ubuntu-latest
-    if: needs.setup.outputs.matrix_include != ''
+    if: needs.setup.outputs.matrix_include != '[]'
     strategy:
       matrix:
         include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
