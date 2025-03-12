@@ -33,8 +33,8 @@ jobs:
         include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
     env:
       MATRIX:   ${{ toJSON(matrix) }}
-      INCOMING: ${{ fromJSON(toJSON(matrix)).incoming }}
-      OUTGOING: ${{ fromJSON(toJSON(matrix)).outgoing }}
+      INCOMING: ${{ toJSON(fromJSON(toJSON(matrix)).incoming) }}
+      OUTGOING: ${{ toJSON(fromJSON(toJSON(matrix)).outgoing) }}
     steps:
       - run: |
           echo "${MATRIX}"
