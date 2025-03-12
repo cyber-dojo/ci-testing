@@ -5,25 +5,31 @@ on:
 
 jobs:
 
-  generate-matrix:
+  setup:
     name: Generate Job Matrix
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix_include: ${{ steps.generate.outputs.matrix_include }}
+    env:
+      JSON: >-
+        [
+          {"service": "in_alpha"},
+          {"service": "in_beta"}
+        ]
     steps:
-      - name: Generate matrix
-        id: set-matrix
-        run: |
-          json="{\"include\": [{\"service\": \"in_alpha\"},{\"service\": \"in_beta\"}]}"
-          echo "matrix=${json}" >> ${GITHUB_OUTPUT}
+      - name: Generate matrix-include
+        id: generate
+        run:
+          echo "matrix_include=$(jq -r -c . <<< ${JSON})" >> ${GITHUB_OUTPUT}
 
   deploy:
-    needs: [generate-matrix]
+    needs: [setup]
     name: Check
     runs-on: ubuntu-latest
-    if: needs.generate-matrix.outputs.matrix != ''
+    if: needs.setup.outputs.matrix_include != ''
     strategy:
-      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
+      matrix:
+        include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
 
     steps:
       - run: |
