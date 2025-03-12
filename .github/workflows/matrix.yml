@@ -16,11 +16,6 @@ jobs:
           {"service": "alpha"},
           {"service": "beta" }
         ]
-#      JSON: >-
-#        [
-#          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
-#          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
-#        ]
     steps:
       - name: Generate matrix-include
         id: generate
@@ -38,19 +33,9 @@ jobs:
         include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
     env:
       MATRIX:   ${{ fromJSON(matrix) }}
-      #INCOMING: ${{ fromJSON(toJSON(matrix)).incoming }}
-      #OUTGOING: ${{ fromJSON(toJSON(matrix)).outgoing }}
     steps:
       - run: |
           echo "matrix: $(jq . <<< "${MATRIX}")"
-#          echo "incoming: $(jq . <<< "${INCOMING}")"
-#          echo "outgoing: $(jq . <<< "${OUTGOING}")"
-#
-#          if [ "$(jq '.service' <<< "${INCOMING}")" == "alpha" ]; then
-#            exit 0
-#          else
-#            exit 1
-#          fi
 
 
   result:
@@ -60,3 +45,22 @@ jobs:
       - run:
           echo "Got to here"
 
+
+
+#      JSON: >-
+#        [
+#          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
+#          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
+#        ]
+
+#INCOMING: ${{ fromJSON(toJSON(matrix)).incoming }}
+#OUTGOING: ${{ fromJSON(toJSON(matrix)).outgoing }}
+
+#          echo "incoming: $(jq . <<< "${INCOMING}")"
+#          echo "outgoing: $(jq . <<< "${OUTGOING}")"
+#
+#          if [ "$(jq '.service' <<< "${INCOMING}")" == "alpha" ]; then
+#            exit 0
+#          else
+#            exit 1
+#          fi
