@@ -13,8 +13,8 @@ jobs:
     env:
       JSON: >-
         [
-          {"incoming":{"service": "in_alpha"}},
-          {"incoming":{"service": "in_beta"}}
+          {"incoming":{"service": "alpha"}},
+          {"incoming":{"service": "beta"}}
         ]
     steps:
       - name: Generate matrix-include
@@ -34,11 +34,11 @@ jobs:
     steps:
       - run: |
           echo "deploy :${{ matrix.incoming.service }}:"
-#          if [ "${{ matrix.incoming.service }}" == "in_alpha" ]; then
-#            exit 0
-#          else
-#            exit 1
-#          fi
+          if [ "${{ matrix.incoming.service }}" == "alpha" ]; then
+            exit 0
+          else
+            exit 1
+          fi
 
 
   result:
