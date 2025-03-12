@@ -20,6 +20,7 @@ jobs:
       - name: Generate matrix-include
         id: generate
         run:
+          echo "matrix_include=$(jq . <<< ${JSON})"
           echo "matrix_include=$(jq -r --compact-output . <<< ${JSON})" >> ${GITHUB_OUTPUT}
 
   deploy:
@@ -32,19 +33,19 @@ jobs:
         include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
     env:
       MATRIX:   ${{ fromJSON(matrix) }}
-      INCOMING: ${{ fromJSON(toJSON(matrix)).incoming }}
-      OUTGOING: ${{ fromJSON(toJSON(matrix)).outgoing }}
+      #INCOMING: ${{ fromJSON(toJSON(matrix)).incoming }}
+      #OUTGOING: ${{ fromJSON(toJSON(matrix)).outgoing }}
     steps:
       - run: |
           echo "matrix: $(jq . <<< "${MATRIX}")"
-          echo "incoming: $(jq . <<< "${INCOMING}")"
-          echo "outgoing: $(jq . <<< "${OUTGOING}")"
-          
-          if [ "$(jq '.service' <<< "${INCOMING}")" == "alpha" ]; then
-            exit 0
-          else
-            exit 1
-          fi
+#          echo "incoming: $(jq . <<< "${INCOMING}")"
+#          echo "outgoing: $(jq . <<< "${OUTGOING}")"
+#
+#          if [ "$(jq '.service' <<< "${INCOMING}")" == "alpha" ]; then
+#            exit 0
+#          else
+#            exit 1
+#          fi
 
 
   result:
