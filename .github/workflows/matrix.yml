@@ -28,7 +28,7 @@ jobs:
     steps:
       - run: |
           echo "deploy :${{ matrix.service }}:"
-          if [ "${{ matrix.service }}" == "alpha" ]; then
+          if [ "${{ matrix.service }}" == "in_alpha" ]; then
             exit 0
           else
             exit 1
