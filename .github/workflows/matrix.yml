@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Generate matrix-include
         id: generate
-        run:
+        run: |
           echo "matrix_include=$(jq . <<< "${JSON}")"
           echo "matrix_include=$(jq -r --compact-output . <<< "${JSON}")" >> ${GITHUB_OUTPUT}
 
