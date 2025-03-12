@@ -32,8 +32,7 @@ jobs:
         include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
     env:
       INCOMING: ${{ toJSON(fromJSON(toJSON(matrix)).incoming) }}
-      #OUTGOING: ${{ toJSON(fromJSON(toJSON(matrix)).outgoing) }}
-      OUTGOING: ${{ (toJSON(matrix.outgoing) }}
+      OUTGOING: ${{ toJSON(fromJSON(toJSON(matrix)).outgoing) }}
     steps:
       - run: |
           jq '.service' <<< "${INCOMING}"
