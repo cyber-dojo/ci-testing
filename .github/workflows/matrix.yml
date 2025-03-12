@@ -13,9 +13,14 @@ jobs:
     env:
       JSON: >-
         [
-          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
-          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
+          {"service": "alpha"},
+          {"service": "beta" }
         ]
+#      JSON: >-
+#        [
+#          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
+#          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
+#        ]
     steps:
       - name: Generate matrix-include
         id: generate
