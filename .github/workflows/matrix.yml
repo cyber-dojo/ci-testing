@@ -35,7 +35,7 @@ jobs:
       MATRIX: ${{ toJSON(matrix) }}
     steps:
       - run:
-          echo "matrix: $(jq -r -c '.' <<< "${MATRIX}")"
+          echo "${MATRIX}"
 
 
   result:
