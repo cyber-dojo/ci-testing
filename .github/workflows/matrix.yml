@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - run: |
-          echo "deploy :${{ matrix.incoming }}:"
+          echo "deploy :${{ matrix.incoming.service }}:"
 #          if [ "${{ matrix.incoming.service }}" == "in_alpha" ]; then
 #            exit 0
 #          else
