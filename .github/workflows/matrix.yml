@@ -14,7 +14,7 @@ jobs:
       JSON: >-
         [
           {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
-          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
+          {"incoming":{"service": "beta" }, "outgoing":{"service": "xbeta"}}
         ]
     steps:
       - name: Generate matrix-include
@@ -32,7 +32,8 @@ jobs:
         include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
     env:
       INCOMING: ${{ toJSON(fromJSON(toJSON(matrix)).incoming) }}
-      OUTGOING: ${{ toJSON(fromJSON(toJSON(matrix)).outgoing) }}
+      #OUTGOING: ${{ toJSON(fromJSON(toJSON(matrix)).outgoing) }}
+      OUTGOING: ${{ (toJSON(matrix.outgoing) }}
     steps:
       - run: |
           jq '.service' <<< "${INCOMING}"
