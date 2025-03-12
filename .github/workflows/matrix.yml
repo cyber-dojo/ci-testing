@@ -14,7 +14,7 @@ jobs:
       - name: Generate matrix
         id: set-matrix
         run: |
-          json="{\"include\": [{\"service\": \"alpha\"},{\"service\": \"beta\"}]}"
+          json="{\"include\": [{\"in\":{\"service\": \"alpha\"}},{\"in\": \"service\": \"beta\"}}]}"
           echo "matrix=${json}" >> ${GITHUB_OUTPUT}
 
   deploy:
@@ -27,8 +27,8 @@ jobs:
 
     steps:
       - run: |
-          echo "deploy :${{ matrix.service }}:"
-          if [ "${{ matrix.service }}" == "alpha" ]; then
+          echo "deploy :${{ matrix.in }}:"
+          if [ "${{ matrix.in.service }}" == "alpha" ]; then
             return 0
           else
             return 1
