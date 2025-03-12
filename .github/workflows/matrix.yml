@@ -32,12 +32,20 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
     env:
-      MATRIX: ${{ toJSON(matrix) }}
+      MATRIX:   ${{ toJSON(matrix) }}
+      INCOMING: ${{ fromJSON(toJSON(matrix)).incoming }}
+      OUTGOING: ${{ fromJSON(toJSON(matrix)).outgoing }}
     steps:
       - run: |
           echo "${MATRIX}"
+          echo "${INCOMING}"
+          echo "${OUTGOING}"
           echo "MATRIX: $(jq -r -c '.' <<< "$MATRIX")"          
+          echo "INCOMING: $(jq -r -c '.' <<< "INCOMING")"          
+          echo "OUTGOING: $(jq -r -c '.' <<< "OUTGOING")"          
 
+          jq '.service' <<< "${INCOMING}"
+          jq '.service' <<< "${OUTGOING}"
 
   result:
     needs: [deploy]
@@ -47,12 +55,6 @@ jobs:
           echo "Got to here"
 
 
-
-#      JSON: >-
-#        [
-#          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
-#          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
-#        ]
 
 #INCOMING: ${{ fromJSON(toJSON(matrix)).incoming }}
 #OUTGOING: ${{ fromJSON(toJSON(matrix)).outgoing }}
