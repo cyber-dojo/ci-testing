@@ -12,12 +12,10 @@ jobs:
       matrix_include: ${{ steps.generate.outputs.matrix_include }}
     env:
       JSON: >-
-        []
-#      JSON: >-
-#        [
-#          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
-#          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
-#        ]
+        [
+          {"incoming":{"service": "alpha"}, "outgoing":{"service": "xalpha"}},
+          {"incoming":{"service": "beta" }, "outgoing":{"service": "xalpha"}}
+        ]
     steps:
       - name: Generate matrix-include
         id: generate
