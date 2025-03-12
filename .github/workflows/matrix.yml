@@ -20,8 +20,8 @@ jobs:
       - name: Generate matrix-include
         id: generate
         run: |
-          echo "matrix_include=$(jq . <<< "${JSON}")"
-          echo "matrix_include=$(jq -r --compact-output . <<< "${JSON}")" >> ${GITHUB_OUTPUT}
+          jq . <<< "${JSON}"
+          echo "matrix_include=$(jq -r -c . <<< "${JSON}")" >> ${GITHUB_OUTPUT}
 
   deploy:
     needs: [setup]
@@ -32,9 +32,9 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
     env:
-      MATRIX:   ${{ fromJSON(matrix) }}
+      MATRIX: ${{ toJSON(matrix) }}
     steps:
-      - run: |
+      - run:
           echo "matrix: $(jq . <<< "${MATRIX}")"
 
 
