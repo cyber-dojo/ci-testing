@@ -9,7 +9,7 @@ jobs:
     name: Generate Job Matrix
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.generate.outputs.matrix }}
+      matrix_include: ${{ steps.generate.outputs.matrix_include }}
     env:
       JSON: >-
         [
@@ -21,16 +21,16 @@ jobs:
         id: generate
         run: |
           jq . <<< "${JSON}"
-          echo "matrix=$(jq -r -c . <<< "${JSON}")" >> ${GITHUB_OUTPUT}
+          echo "matrix_include=$(jq -r -c . <<< "${JSON}")" >> ${GITHUB_OUTPUT}
 
   deploy:
     needs: [setup]
     name: Check
     runs-on: ubuntu-latest
-    if: needs.setup.outputs.matrix != ''
+    if: needs.setup.outputs.matrix_include != ''
     strategy:
       matrix:
-        include: ${{ fromJSON(needs.setup.outputs.matrix) }}
+        include: ${{ fromJSON(needs.setup.outputs.matrix_include) }}
     env:
       MATRIX: ${{ toJSON(matrix) }}
     steps:
