@@ -35,22 +35,22 @@ jobs:
       OUTGOING: ${{ toJSON(fromJSON(toJSON(matrix)).outgoing) }}
     steps:
       - run: |
-          #echo -----
-          #echo ${{ matrix }}
-          #echo -----
-          #echo "${{ toJSON(matrix) }}"
-          echo ----- 
-          cat <(echo "${{ toJSON(matrix) }}")
-          echo -----                    
+#          echo -----
+#          echo ${{ matrix }}
+#          echo -----
+#          echo "${{ toJSON(matrix) }}"
+#          echo -----
+#          cat <(echo "${{ toJSON(matrix) }}")
+#          echo -----
           jq -r . <(echo "${{ toJSON(matrix) }}")
-          echo -----          
-          jq '.service' <<< "${INCOMING}"
-          jq '.service' <<< "${OUTGOING}"
-          if [ "$(jq '.service' <<< "${INCOMING}")" == "alpha" ]; then
-            exit 0
-          else
-            exit 1
-          fi
+#          echo -----
+#          jq '.service' <<< "${INCOMING}"
+#          jq '.service' <<< "${OUTGOING}"
+#          if [ "$(jq '.service' <<< "${INCOMING}")" == "alpha" ]; then
+#            exit 0
+#          else
+#            exit 1
+#          fi
 
   result:
     needs: [deploy]
