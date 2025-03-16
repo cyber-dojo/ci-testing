@@ -35,8 +35,9 @@ jobs:
       OUTGOING: ${{ toJSON(fromJSON(toJSON(matrix)).outgoing) }}
       MATRIX: ${{ toJSON(matrix) }}
     steps:
-      - run:
+      - run: |
           jq -r . <<< "${MATRIX}"
+          jq -r . <(echo "${MATRIX}")
 
 #          echo -----
 #          echo ${{ matrix }}
