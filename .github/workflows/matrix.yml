@@ -41,8 +41,6 @@ jobs:
           #echo "${{ toJSON(matrix) }}"
           echo ----- 
           cat <(echo "${{ toJSON(matrix) }}")
-          echo -----          
-          cat <(echo "${{ fromJSON(toJSON(matrix)) }}")
           echo -----                    
           jq -r . <(echo "${{ toJSON(matrix) }}")
           echo -----          
