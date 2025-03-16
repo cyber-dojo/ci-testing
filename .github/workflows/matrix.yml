@@ -34,7 +34,8 @@ jobs:
       INCOMING: ${{ toJSON(fromJSON(toJSON(matrix)).incoming) }}
       OUTGOING: ${{ toJSON(fromJSON(toJSON(matrix)).outgoing) }}
     steps:
-      - run: |
+      - run:
+          jq -r . <(echo "${{ toJSON(matrix) }}")
 #          echo -----
 #          echo ${{ matrix }}
 #          echo -----
@@ -42,7 +43,6 @@ jobs:
 #          echo -----
 #          cat <(echo "${{ toJSON(matrix) }}")
 #          echo -----
-          jq -r . <(echo "${{ toJSON(matrix) }}")
 #          echo -----
 #          jq '.service' <<< "${INCOMING}"
 #          jq '.service' <<< "${OUTGOING}"
