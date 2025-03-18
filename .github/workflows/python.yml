@@ -1,0 +1,19 @@
+
+name: Main
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  setup:
+    name: Test if python is in default runner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run something that needs python
+        run:
+          which python3
