@@ -1,6 +1,10 @@
 FROM alpine:3.21
 LABEL maintainer=jon@jaggersoft.com
 
-WORKDIR /differ
-COPY . .
+ARG VAR_THE_FIRST
+ENV VAR_THE_FIRST=${VAR_THE_FIRST}
+
+ARG VAR_THE_SECOND
+ENV VAR_THE_SECOND=${VAR_THE_SECOND}
+
 USER nobody
