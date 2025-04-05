@@ -43,7 +43,7 @@ jobs:
       CHECKOUT_REPOSITORY: cyber-dojo/saver
       CHECKOUT_REF: f384d7a910100d3701361299a06fece0550941a6
       CHECKOUT_FETCH_DEPTH: 1
-      IMAGE_NAME: ${{ needs.setup.outputs.registry }}/${{ needs.setup.outputs.service_name }}
+      IMAGE_NAME: cyberdojo/${{ needs.setup.outputs.service_name }}
       IMAGE_TAG: ${{ needs.setup.outputs.image_tag }}
       IMAGE_BUILD_ARGS: |
         COMMIT_SHA=f384d7a910100d3701361299a06fece0550941a6
