@@ -48,8 +48,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       digest:     ${{ steps.sanitize-digest.outputs.digest }}
-      cache_path: ${{ steps.sanitize-digest.outputs.cache_path }}
-      cache_key:  ${{ steps.sanitize-digest.outputs.cache_key }}
+      cache_path: ${{ steps.set-cache.outputs.cache_path }}
+      cache_key:  ${{ steps.set-cache.outputs.cache_key }}
     steps:
       - uses: actions/checkout@v4
         with:
