@@ -55,9 +55,9 @@ jobs:
     needs: [setup]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+#      - uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 1
 
 #      - name: Retrieve Docker image from cache
 #        uses: actions/cache@v4
@@ -71,6 +71,9 @@ jobs:
 
       - uses: ./.github/workflows/docker-image-load.yml
         with:
+          CHECKOUT_REPOSITORY: cyber-dojo/saver
+          CHECKOUT_REF: f384d7a910100d3701361299a06fece0550941a6
+          CHECKOUT_FETCH_DEPTH: 1
           #IMAGE_TAR_FILENAME: ${{ needs.build-image.outputs.image_tar_filename }}
           IMAGE_TAR_FILENAME: 036cf0dd69fd6f453a328ab8a6fd6983dd148fdbc1e99f46d85f129944aceb69.tar
           IMAGE_NAME: cyberdojo/${{ needs.setup.outputs.service_name }}

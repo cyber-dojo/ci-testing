@@ -3,6 +3,16 @@ name: Secure docker build
 on:
   workflow_call:
     inputs:
+      CHECKOUT_REPOSITORY:
+        required: true
+        type: string
+      CHECKOUT_REF:
+        required: true
+        type: string
+      CHECKOUT_FETCH_DEPTH:
+        required: true
+        type: string
+
       IMAGE_TAR_FILENAME:
         required: true
         type: string
@@ -18,7 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          repository: ${{ inputs.CHECKOUT_REPOSITORY }}
+          ref: ${{ inputs.CHECKOUT_REF }}
+          fetch-depth: ${{ inputs.CHECKOUT_FETCH_DEPTH }}
 
       - name: Retrieve Docker image from cache
         uses: actions/cache@v4
@@ -28,5 +40,4 @@ jobs:
 
       - name: Load Docker image
         run:
-          docker image load 
-            --input "${{ inputs.IMAGE_TAR_FILENAME }}"
+          docker image load --input "${{ inputs.IMAGE_TAR_FILENAME }}"
