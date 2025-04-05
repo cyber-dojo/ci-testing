@@ -59,11 +59,21 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: ./.github/workflows/docker-image-load.yml
+      - name: Retrieve Docker image from cache
+        uses: actions/cache@v4
         with:
-          #IMAGE_TAR_FILENAME: ${{ needs.build-image.outputs.image_tar_filename }}
-          IMAGE_TAR_FILENAME: 036cf0dd69fd6f453a328ab8a6fd6983dd148fdbc1e99f46d85f129944aceb69.tar
-          IMAGE_NAME: cyberdojo/${{ needs.setup.outputs.service_name }}
+          path: 036cf0dd69fd6f453a328ab8a6fd6983dd148fdbc1e99f46d85f129944aceb69.tar
+          key:  cyberdojo/${{ needs.setup.outputs.service_name }}
+
+      - name: Load Docker image
+        run:
+          docker image load  --input 036cf0dd69fd6f453a328ab8a6fd6983dd148fdbc1e99f46d85f129944aceb69.tar
+
+#      - uses: ./.github/workflows/docker-image-load.yml
+#        with:
+#          #IMAGE_TAR_FILENAME: ${{ needs.build-image.outputs.image_tar_filename }}
+#          IMAGE_TAR_FILENAME: 036cf0dd69fd6f453a328ab8a6fd6983dd148fdbc1e99f46d85f129944aceb69.tar
+#          IMAGE_NAME: cyberdojo/${{ needs.setup.outputs.service_name }}
 
       - name: Check image is locally available
         run:
