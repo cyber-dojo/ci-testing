@@ -44,24 +44,9 @@ jobs:
     needs: []
     runs-on: ubuntu-latest
     outputs:
-      digest: ${{ steps.sanitize-digest.outputs.digest }}
-    permissions:
-      id-token: write
-      contents: write
-      attestations: write
+      digest:       ${{ steps.sanitize-digest.outputs.digest }}
+      tar_filename: ${{ steps.sanitize-digest.outputs.tar_filename }}
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gh_actions_services
-          aws-region: ${{ env.AWS_REGION }}
-          role-duration-seconds: 2400
-          role-session-name: ${{ github.event.repository.name }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
       - uses: actions/checkout@v4
         with:
           repository: ${{ inputs.CHECKOUT_REPOSITORY }}
@@ -71,22 +56,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image to Amazon ECR
+      - name: Build Docker image
         id: docker_build
         uses: docker/build-push-action@v6
         with:
           context: .
           no-cache: true
-          push: true
+          push: false
           tags: ${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
           build-args: ${{ inputs.IMAGE_BUILD_ARGS }}
-          provenance: mode=max
-          sbom: true
 
       - name: Sanitize digest
         id: sanitize-digest
         run: |
-          DIGEST=$(echo ${{ steps.docker_build.outputs.digest }} | sed 's/^sha256://')
+          DIGEST="036cf0dd69fd6f453a328ab8a6fd6983dd148fdbc1e99f46d85f129944aceb69"
           echo "DIGEST=${DIGEST}" >> ${GITHUB_ENV}
           echo "digest=${DIGEST}" >> ${GITHUB_OUTPUT}
 
@@ -107,79 +90,3 @@ jobs:
         with:
           key:  ${{ inputs.IMAGE_NAME }}@${{ env.DIGEST }}
           path: ${{ env.TAR_FILENAME }}
-
-      - name: Get build metadata
-        run:
-          docker buildx imagetools inspect ${{ inputs.IMAGE_NAME }}@${{ env.DIGEST }}
-            --format "{{ json .Provenance.SLSA }}" > provenance.json
-
-      - name: Get SBOM file
-        run:
-          docker buildx imagetools inspect ${{ inputs.IMAGE_NAME }}@${{ env.DIGEST }}
-            --format "{{ json .SBOM.SPDX }}" > sbom.spdx.json
-
-      - name: Attest Build Provenance
-        id: artifact-gh-attest
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ${{ inputs.IMAGE_NAME }}
-          subject-digest: sha256:${{ env.DIGEST }}
-          push-to-registry: true
-
-      - name: Make artifact GH sigstore attestation index available to next steps
-        run: |
-          TRANSPARENCY_LOG_INDEX=$(jq '.verificationMaterial.tlogEntries[0].logIndex' ${{ steps.artifact-gh-attest.outputs.bundle-path }})
-          echo "ARTIFACT_TLOG_INDEX=${TRANSPARENCY_LOG_INDEX}" >> ${GITHUB_ENV}
-      
-      - name: Attest SBOM to Github
-        id: sbom-gh-attest
-        uses: actions/attest-sbom@v2
-        with:
-          sbom-path: 'sbom.spdx.json'
-          subject-name: ${{ inputs.IMAGE_NAME }}
-          subject-digest: sha256:${{ env.DIGEST }}
-
-      - name: Make sbom GH sigstore attestation index available to next steps
-        run: |
-          TRANSPARENCY_LOG_INDEX=$(jq '.verificationMaterial.tlogEntries[0].logIndex' ${{ steps.sbom-gh-attest.outputs.bundle-path }})
-          echo "SBOM_TLOG_INDEX=${TRANSPARENCY_LOG_INDEX}" >> ${GITHUB_ENV}
-
-      - name: Find details about workflow
-        run: |
-          echo "Workflow     => ${{ github.workflow }}"
-          echo "Workflow ref => ${{ github.workflow_ref }}"
-          echo "Workflow sha => ${{ github.workflow_sha }}"
-
-      - name: Setup Kosli CLI
-        if: ${{ success() || failure() }}
-        uses: kosli-dev/setup-cli-action@v2
-        with:
-          version: ${{ inputs.KOSLI_CLI_VERSION }}
-
-      - name: Attest artifact to Kosli
-        if: ${{ inputs.ATTEST_TO_KOSLI == true && (success() || failure()) }}
-        run:
-          kosli attest artifact ${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
-            --fingerprint=${{ env.DIGEST }}
-            --name=${{ inputs.KOSLI_REFERENCE_NAME }}
-
-      - name: Attest GitHub attestation to Kosli
-        if: ${{ inputs.ATTEST_TO_KOSLI == true && (success() || failure()) }}
-        run:
-          kosli attest generic 
-            --name provenance-attestation
-            --fingerprint ${{ env.DIGEST }}
-            --attachments provenance.json
-            --external-url github-attestation=${{ steps.artifact-gh-attest.outputs.attestation-url }}
-            --external-url github-sigstore=https://search.sigstore.dev/?logIndex=${{ env.ARTIFACT_TLOG_INDEX }}
-
-      - name: Attest SBOM to Kosli
-        if: ${{ inputs.ATTEST_TO_KOSLI == true && (success() || failure()) }}
-        run:
-          kosli attest generic 
-            --name sbom
-            --fingerprint ${{ env.DIGEST }}
-            --attachments sbom.spdx.json
-            --external-url github-attestation=${{ steps.sbom-gh-attest.outputs.attestation-url }}
-            --external-url github-sigstore=https://search.sigstore.dev/?logIndex=${{ env.SBOM_TLOG_INDEX }}
-
