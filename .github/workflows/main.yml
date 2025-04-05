@@ -5,8 +5,8 @@ on:
   push:
 
 env:
-  DOCKER_API_VERSION:  ${{ vars.DOCKER_API_VERSION }}
-  SERVICE_NAME:        saver
+  DOCKER_API_VERSION: ${{ vars.DOCKER_API_VERSION }}
+  SERVICE_NAME:       saver
 
 jobs:
 
@@ -45,6 +45,9 @@ jobs:
       CHECKOUT_FETCH_DEPTH: 1
       IMAGE_NAME: ${{ needs.setup.outputs.registry }}/${{ needs.setup.outputs.service_name }}
       IMAGE_TAG: ${{ needs.setup.outputs.image_tag }}
+      IMAGE_BUILD_ARGS: |
+        COMMIT_SHA=f384d7a910100d3701361299a06fece0550941a6
+        BASE_IMAGE=cyberdojo/sinatra-base:bd4064a@sha256:5a3480df5e67cb11bee557ef0d8ef73253db849c1cc816e89d5a6ce07fe40c9f
 
 
 #  after-build:
