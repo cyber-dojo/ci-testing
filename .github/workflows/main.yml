@@ -57,10 +57,6 @@ jobs:
       IMAGE_CACHE_PATH: ${{ needs.build-image.outputs.cache_path }}
       IMAGE_CACHE_KEY:  ${{ needs.build-image.outputs.cache_key }}
     steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 1
-
       - name: Retrieve Docker image from cache
         uses: actions/cache@v4
         with:
