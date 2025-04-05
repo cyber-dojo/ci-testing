@@ -50,15 +50,15 @@ jobs:
         BASE_IMAGE=cyberdojo/sinatra-base:bd4064a@sha256:5a3480df5e67cb11bee557ef0d8ef73253db849c1cc816e89d5a6ce07fe40c9f
 
 
-#  after-build:
-#    needs: [setup, build-image]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: ./.github/workflows/docker-image-load.yml
-#        with:
-#          IMAGE_TAR_FILENAME: ${{ needs.build-image.outputs.image_tar_filename }}
-#          IMAGE_NAME: ${{ needs.setup.outputs.ecr_registry }}/${{ needs.setup.outputs.service_name }}
-#
-#      - name: Check image is locally available
-#        run:
-#          docker image ls | grep saver
+  after-build:
+    needs: [setup, build-image]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/docker-image-load.yml
+        with:
+          IMAGE_TAR_FILENAME: ${{ needs.build-image.outputs.image_tar_filename }}
+          IMAGE_NAME: cyberdojo/${{ needs.setup.outputs.service_name }}
+
+      - name: Check image is locally available
+        run:
+          docker image ls | grep saver
