@@ -53,20 +53,28 @@ jobs:
   after-build:
     needs: [setup, build-image]
     runs-on: ubuntu-latest
+    env:
+      CACHE_PATH: ${{ needs.build-image.outputs.cache_path }}
+      CACHE_KEY:  ${{ needs.build-image.outputs.cache_key }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
+      - name: Show build-image outputs
+        run: |
+          echo "cache_path=:${{ needs.build-image.outputs.cache_path }}:"
+          echo "cache_key=:${{ needs.build-image.outputs.cache_key }}:"
+
       - name: Retrieve Docker image from cache
         uses: actions/cache@v4
         with:
-          path: ${{ needs.build-image.outputs.cache_path }}
-          key:  ${{ needs.build-image.outputs.cache_key }}
+          path: ${{ env.CACHE_PATH }}
+          key:  ${{ env.CACHE_KEY }}
 
       - name: Load Docker image
         run:
-          docker image load  --input ${{ needs.build-image.outputs.cache_path }}
+          docker image load  --input ${{ env.CACHE_PATH }}
 
       - name: Check image is locally available
         run:
