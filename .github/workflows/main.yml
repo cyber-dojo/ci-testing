@@ -1,0 +1,70 @@
+
+name: Main
+
+on:
+  push:
+
+env:
+  AWS_ECR_ID:          ${{ vars.AWS_ECR_ID }}
+  AWS_REGION:          ${{ vars.AWS_REGION }}
+  AWS_ACCOUNT_ID_BETA: ${{ vars.AWS_ACCOUNT_ID_BETA }}
+  DOCKER_API_VERSION:  ${{ vars.DOCKER_API_VERSION }}
+  SERVICE_NAME:        saver
+
+jobs:
+
+  setup:
+    runs-on: ubuntu-latest
+    needs: []
+    outputs:
+      aws_account_id_beta:      ${{ steps.vars.outputs.aws_account_id_beta }}
+      ecr_registry:             ${{ steps.vars.outputs.ecr_registry }}
+      aws_region:               ${{ steps.vars.outputs.aws_region }}
+      gh_actions_iam_role_name: ${{ steps.vars.outputs.gh_actions_iam_role_name }}
+      service_name:             ${{ steps.vars.outputs.service_name }}
+      image_tag:                ${{ steps.vars.outputs.image_tag }}
+      image_name:               ${{ steps.vars.outputs.image_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Prepare outputs for workflow jobs
+        id: vars
+        run: |
+          ECR_REGISTRY="${AWS_ECR_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"          
+          IMAGE_TAG="${GITHUB_SHA:0:7}"                  
+          IMAGE_NAME="${ECR_REGISTRY}/${{ env.SERVICE_NAME }}:${IMAGE_TAG}"
+          
+          echo "aws_account_id_beta=${AWS_ACCOUNT_ID_BETA}"   >> ${GITHUB_OUTPUT}          
+          echo "ecr_registry=${ECR_REGISTRY}"                 >> ${GITHUB_OUTPUT}
+          echo "aws_region=${AWS_REGION}"                     >> ${GITHUB_OUTPUT}
+          echo "gh_actions_iam_role_name=gh_actions_services" >> ${GITHUB_OUTPUT}
+          echo "service_name=${{ env.SERVICE_NAME }}"         >> ${GITHUB_OUTPUT}
+          echo "image_tag=${IMAGE_TAG}"                       >> ${GITHUB_OUTPUT}
+          echo "image_name=${IMAGE_NAME}"                     >> ${GITHUB_OUTPUT}          
+
+
+  build-image:
+    needs: [setup]
+    uses: .github/workflows/secure-docker-build.yml@main
+    with:
+      CHECKOUT_REPOSITORY: cyber-dojo/saver
+      CHECKOUT_REF: f384d7a910100d3701361299a06fece0550941a6
+      CHECKOUT_FETCH_DEPTH: 1
+      IMAGE_NAME: ${{ needs.setup.outputs.ecr_registry }}/${{ needs.setup.outputs.service_name }}
+      IMAGE_TAG: ${{ needs.setup.outputs.image_tag }}
+
+
+  after-build:
+    needs: [setup, build-image]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: .github/workflows/docker-image-load.yml@main
+        with:
+          IMAGE_TAR_FILENAME: ${{ needs.build-image.outputs.image_tar_filename }}
+          IMAGE_NAME: ${{ needs.setup.outputs.ecr_registry }}/${{ needs.setup.outputs.service_name }}
+
+      - name: Check image is locally available
+        run:
+          docker image ls | grep saver
