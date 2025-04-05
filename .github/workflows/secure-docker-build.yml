@@ -82,11 +82,11 @@ jobs:
 
       - name: Save Docker image
         run:
-          docker image save ${{ inputs.IMAGE_NAME }}@${{ env.DIGEST }}
+          docker image save ${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
             --output ${{ env.TAR_FILENAME }}
 
       - name: Cache Docker image
         uses: actions/cache@v4
         with:
-          key:  ${{ inputs.IMAGE_NAME }}@${{ env.DIGEST }}
+          key:  ${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
           path: ${{ env.TAR_FILENAME }}
