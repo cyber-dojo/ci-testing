@@ -52,7 +52,7 @@ jobs:
 
 
   after-build:
-    needs: [setup, after-build]
+    needs: [setup, build-image]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
