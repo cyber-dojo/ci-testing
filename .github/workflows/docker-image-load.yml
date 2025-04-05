@@ -3,16 +3,6 @@ name: Secure docker build
 on:
   workflow_call:
     inputs:
-      CHECKOUT_REPOSITORY:
-        required: true
-        type: string
-      CHECKOUT_REF:
-        required: true
-        type: string
-      CHECKOUT_FETCH_DEPTH:
-        required: true
-        type: string
-
       IMAGE_TAR_FILENAME:
         required: true
         type: string
@@ -26,6 +16,8 @@ jobs:
     needs: []
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/checkout@v4
         with:
           repository: ${{ inputs.CHECKOUT_REPOSITORY }}
