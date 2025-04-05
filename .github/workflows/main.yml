@@ -38,7 +38,8 @@ jobs:
 
   build-image:
     needs: [setup]
-    uses: ./.github/workflows/secure-docker-build2.yml
+    #uses: ./.github/workflows/secure-docker-build2.yml
+    uses: cyber-dojo/reusable-actions-workflows/.github/workflows/secure-docker-build2.yml@main
     with:
       CHECKOUT_REPOSITORY: cyber-dojo/saver
       CHECKOUT_REF: f384d7a910100d3701361299a06fece0550941a6
