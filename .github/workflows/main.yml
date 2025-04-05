@@ -47,7 +47,7 @@ jobs:
 
   build-image:
     needs: [setup]
-    uses: ./.github/workflows/secure-docker-build.yml@main
+    uses: ./.github/workflows/secure-docker-build.yml
     with:
       CHECKOUT_REPOSITORY: cyber-dojo/saver
       CHECKOUT_REF: f384d7a910100d3701361299a06fece0550941a6
@@ -60,7 +60,7 @@ jobs:
 #    needs: [setup, build-image]
 #    runs-on: ubuntu-latest
 #    steps:
-#      - uses: ./.github/workflows/docker-image-load.yml@main
+#      - uses: ./.github/workflows/docker-image-load.yml
 #        with:
 #          IMAGE_TAR_FILENAME: ${{ needs.build-image.outputs.image_tar_filename }}
 #          IMAGE_NAME: ${{ needs.setup.outputs.ecr_registry }}/${{ needs.setup.outputs.service_name }}
