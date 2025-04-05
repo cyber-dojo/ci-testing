@@ -61,12 +61,12 @@ jobs:
       - name: Retrieve Docker image from cache
         uses: actions/cache@v4
         with:
-          path: ${{ needs.build-image.output.cache_path }}
-          key:  ${{ needs.build-image.output.cache_key }}
+          path: ${{ needs.build-image.outputs.cache_path }}
+          key:  ${{ needs.build-image.outputs.cache_key }}
 
       - name: Load Docker image
         run:
-          docker image load  --input ${{ needs.build-image.output.cache_path }}
+          docker image load  --input ${{ needs.build-image.outputs.cache_path }}
 
       - name: Check image is locally available
         run:
