@@ -47,8 +47,9 @@ jobs:
     needs: []
     runs-on: ubuntu-latest
     outputs:
-      digest:       ${{ steps.sanitize-digest.outputs.digest }}
-      tar_filename: ${{ steps.sanitize-digest.outputs.tar_filename }}
+      digest:     ${{ steps.sanitize-digest.outputs.digest }}
+      cache_path: ${{ steps.sanitize-digest.outputs.cache_path }}
+      cache_key:  ${{ steps.sanitize-digest.outputs.cache_key }}
     steps:
       - uses: actions/checkout@v4
         with:
