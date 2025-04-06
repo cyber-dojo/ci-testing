@@ -14,10 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: []
     outputs:
-      registry:     ${{ steps.vars.outputs.registry }}
       service_name: ${{ steps.vars.outputs.service_name }}
       image_tag:    ${{ steps.vars.outputs.image_tag }}
-      image_name:   ${{ steps.vars.outputs.image_name }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,14 +24,9 @@ jobs:
       - name: Prepare outputs for workflow jobs
         id: vars
         run: |
-          REGISTRY="dockerhub.com"          
-          IMAGE_TAG="f384d7a"                  
-          IMAGE_NAME="${REGISTRY}/${{ env.SERVICE_NAME }}:${IMAGE_TAG}"
-          
-          echo "registry=${REGISTRY}"                 >> ${GITHUB_OUTPUT}
+          IMAGE_TAG="d23d154"                            
           echo "service_name=${{ env.SERVICE_NAME }}" >> ${GITHUB_OUTPUT}
           echo "image_tag=${IMAGE_TAG}"               >> ${GITHUB_OUTPUT}
-          echo "image_name=${IMAGE_NAME}"             >> ${GITHUB_OUTPUT}          
 
 
   build-image:
@@ -41,12 +34,12 @@ jobs:
     uses: cyber-dojo/reusable-actions-workflows/.github/workflows/secure-docker-build2.yml@main
     with:
       CHECKOUT_REPOSITORY: cyber-dojo/saver
-      CHECKOUT_REF: f384d7a910100d3701361299a06fece0550941a6
+      CHECKOUT_REF: d23d154bcb51628250bd4b045fcb113cd9d069df
       CHECKOUT_FETCH_DEPTH: 1
       IMAGE_NAME: cyberdojo/${{ needs.setup.outputs.service_name }}
       IMAGE_TAG: ${{ needs.setup.outputs.image_tag }}
       IMAGE_BUILD_ARGS: |
-        COMMIT_SHA=f384d7a910100d3701361299a06fece0550941a6
+        COMMIT_SHA=d23d154bcb51628250bd4b045fcb113cd9d069df
         BASE_IMAGE=cyberdojo/sinatra-base:bd4064a@sha256:5a3480df5e67cb11bee557ef0d8ef73253db849c1cc816e89d5a6ce07fe40c9f
 
 
