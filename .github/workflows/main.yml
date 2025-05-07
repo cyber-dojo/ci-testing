@@ -24,3 +24,10 @@ jobs:
           no-cache: true
           push: false
           tags: cyberdojo/ci-testing:11223344
+
+  approve:
+    needs: [build-image]
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url:  https://cyber-dojo.org
