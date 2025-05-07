@@ -7,9 +7,6 @@ jobs:
   build-image:
     runs-on: ubuntu-latest
     needs: []
-    environment:
-      name: production
-      url:  https://cyber-dojo.org
     strategy:
       matrix:
         example:
@@ -32,3 +29,14 @@ jobs:
           push: false
           tags: cyberdojo/ci-testing:11223344
 
+  approve:
+    runs-on: ubuntu-latest
+    needs: [build-image]
+    environment:
+      name: production
+      url:  https://cyber-dojo.org
+    steps:
+      - name: Approval
+        run:
+          echo "Approval to aws-prod"
+        
