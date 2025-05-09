@@ -38,5 +38,4 @@ jobs:
     steps:
       - name: Approval
         run:
-          echo "Approval to aws-prod"
-        
+          echo "Approval to aws-prod - does this run before or after the approval is made?"
