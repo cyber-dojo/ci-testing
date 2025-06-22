@@ -27,7 +27,7 @@ jobs:
       - name: Show stuff
         run: |
           echo "${PROMOTION}" | jq .
-          echo "<a href="https://app.kosli.com/cyber-dojo/flows/runner-ci/trails/d5e3708fd6e141b0d6ec4f5120804059c74d2757?attestation_id=c365255f-bbf8-4d38-b0db-1975cb48">kosli attest unit-test</a>" >> "${GITHUB_STEP_SUMMARY}"
+          echo "[kosli attest unit-test](https://app.kosli.com/cyber-dojo/flows/runner-ci/trails/d5e3708fd6e141b0d6ec4f5120804059c74d2757?attestation_id=c365255f-bbf8-4d38-b0db-1975cb48)" >> "${GITHUB_STEP_SUMMARY}"
           
 
 #  approve:
