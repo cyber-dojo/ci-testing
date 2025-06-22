@@ -25,8 +25,9 @@ jobs:
       PROMOTION: ${{ toJSON(matrix) }}
     steps:
       - name: Show stuff
-        run:
+        run: |
           echo "${PROMOTION}" | jq .
+          echo "{## Hello world}" >> "${GITHUB_STEP_SUMMARY}"
 
 #  approve:
 #    runs-on: ubuntu-latest
