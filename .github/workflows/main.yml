@@ -27,7 +27,7 @@ jobs:
       - name: Show stuff
         run: |
           echo "${PROMOTION}" | jq .
-          echo "{## Hello world}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "## Hello world" >> "${GITHUB_STEP_SUMMARY}"
 
 #  approve:
 #    runs-on: ubuntu-latest
