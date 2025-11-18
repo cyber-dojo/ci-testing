@@ -8,10 +8,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: []
     steps:
-      - name: Something that fails
+      - name: Failing
         run:
           exit 3
 
+      - name: Setup Kosli CLI
+        if: ${{ github.ref == 'refs/heads/main' && success() }}
+        uses: kosli-dev/setup-cli-action@v2
+        with:
+          version: ${{ vars.KOSLI_CLI_VERSION }}
+      
+
+  # downstream does NOT run if upstream has only the failing step
   downstream:
     runs-on: ubuntu-latest
     needs: [upstream]
