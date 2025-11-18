@@ -24,6 +24,7 @@ jobs:
           echo 42
 
   # downstream does NOT run if upstream has only the Failing step
+  # downstream does NOT run if upstream has Failing step AND SetupKosli with if: 
   # downstream does NOT run if upstream has Failing step AND SetupKosli with if: && success()
   # downstream does NOT run if upstream has Failing step AND SetupKosli with if: && success()||failure()
   downstream:
