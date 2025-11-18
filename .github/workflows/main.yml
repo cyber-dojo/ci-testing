@@ -13,13 +13,13 @@ jobs:
           exit 3
 
       - name: Setup Kosli CLI
-        if: ${{ github.ref == 'refs/heads/main' && (success() || failure()) }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: kosli-dev/setup-cli-action@v2
         with:
           version: ${{ vars.KOSLI_CLI_VERSION }}
 
       - name: Attest
-        if: ${{ github.ref == 'refs/heads/main' && (success() || failure()) }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         run:
           echo 42
 
