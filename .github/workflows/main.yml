@@ -17,10 +17,15 @@ jobs:
         uses: kosli-dev/setup-cli-action@v2
         with:
           version: ${{ vars.KOSLI_CLI_VERSION }}
-      
+
+      - name: Attest
+        if: ${{ github.ref == 'refs/heads/main' && (success() || failure()) }}
+        run:
+          echo 42
 
   # downstream does NOT run if upstream has only the Failing step
   # downstream does NOT run if upstream has Failing step AND SetupKosli with if: && success()
+  # downstream does NOT run if upstream has Failing step AND SetupKosli with if: && success()||failure()
   downstream:
     runs-on: ubuntu-latest
     needs: [upstream]
