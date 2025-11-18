@@ -4,39 +4,19 @@ on:
   push:
 
 jobs:
-  find-promotions:
+  upstream:
     runs-on: ubuntu-latest
     needs: []
-    outputs:
-      promotions: "${{ steps.vars.outputs.promotions }}"
     steps:
-      - name: Generate JSON for each Artifact promotion for use in the following job's strategy:matrix:include
-        id: vars
+      - name: Something that fails
         run:
-          echo "promotions=[{"x":42,"y":24},{"x":43,"y":34}]" >> ${GITHUB_OUTPUT}
+          exit 3
 
-  build-image:
+  downstream:
     runs-on: ubuntu-latest
-    needs: [find-promotions]
-    strategy:
-      matrix:
-        include: ${{ fromJSON(needs.find-promotions.outputs.promotions) }}
-    env:
-      PROMOTION: ${{ toJSON(matrix) }}
+    needs: [upstream]
     steps:
       - name: Show stuff
-        run: |
-          echo "${PROMOTION}" | jq .
-          echo "[kosli attest unit-test](https://app.kosli.com/cyber-dojo/flows/runner-ci/trails/d5e3708fd6e141b0d6ec4f5120804059c74d2757?attestation_id=c365255f-bbf8-4d38-b0db-1975cb48)" >> "${GITHUB_STEP_SUMMARY}"
-          
+        run: 
+          echo "We got to here"
 
-#  approve:
-#    runs-on: ubuntu-latest
-#    needs: [build-image]
-#    environment:
-#      name: production
-#      url:  https://cyber-dojo.org
-#    steps:
-#      - name: Approval
-#        run:
-#          echo "Approval to aws-prod - does this run before or after the approval is made? Answer==after"
