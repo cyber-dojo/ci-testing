@@ -20,14 +20,14 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          set -e
+          set +e
           snyk code test \
             --policy-path=.snyk \
             --sarif \
             --sarif-file-output="${SARIF_FILENAME}" \
             ./bad_dir
           STATUS=$?
-          set +e 
+          set -e 
           echo "STATUS=:${STATUS}:"
           cat "${SARIF_FILENAME}"
 
