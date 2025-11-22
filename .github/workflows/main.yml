@@ -15,7 +15,7 @@ jobs:
 
       - name: Show repo url
         run:
-          echo "X ${{ github.server_url }}/${{ github.repository }} X"
+          echo "X ${{ github.server_url }}/${{ github.repository_owner }} X"
 
       - name: Setup Snyk
         uses: snyk/actions/setup@master
