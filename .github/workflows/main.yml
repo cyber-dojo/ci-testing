@@ -5,33 +5,18 @@ on:
 
 jobs:
 
-  snyk-code-scan:
+  first:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     needs: []
-    env:
-      SARIF_FILENAME: snyk.code.scan.json
     steps:
       - uses: actions/checkout@v4
 
+  second:
+    runs-on: ubuntu-latest
+    needs: [first]
+    steps:
       - name: Show repo url
         run:
           echo "X ${{ github.server_url }}/${{ github.repository_owner }} X"
-
-      - name: Setup Snyk
-        uses: snyk/actions/setup@master
-
-      - name: Run Snyk code scan
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: |
-          set +e
-          snyk code test \
-            --policy-path=.snyk \
-            --sarif \
-            --sarif-file-output="${SARIF_FILENAME}" \
-            ./bad_dir
-          STATUS=$?
-          set -e 
-          echo "STATUS=:${STATUS}:"
-          cat "${SARIF_FILENAME}"
 
