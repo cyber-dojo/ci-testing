@@ -22,7 +22,7 @@ jobs:
       matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}    
     steps:
       - id: set-matrix
-        run: echo "matrix={\"include\":[{\"colour\":\"${{matrix.colour}}\"},{\"id\":\"SNYK-234\"},{\"colour\":\"${{matrix.colour}}\"},{\"id\":\"SNYK-567\"}]}" >> $GITHUB_OUTPUT
+        run: echo "matrix={\"include\":[{\"colour\":\"${{matrix.colour}}\",\"id\":\"SNYK-234\"},{\"colour\":\"${{matrix.colour}}\",\"id\":\"SNYK-567\"}]}" >> $GITHUB_OUTPUT
 
   job3:
     needs: job2
