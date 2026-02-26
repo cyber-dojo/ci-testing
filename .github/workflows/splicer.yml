@@ -15,13 +15,13 @@ on:
 jobs:
   setup-matrix:
     runs-on: ubuntu-latest
-  outputs:
-    matrix-combinations: ${{ steps.vars.outputs.all }}  
-  steps:
-    - name: Setup matrix combinations
-      id: vars
-      run:
-        echo "all=[{\"col\":\"red\",\"id\":\"23\"},{\"col\":\"red\",\"id\":\"24\"}]" >> ${GITHUB_OUTPUT}
+    outputs:
+      matrix-combinations: ${{ steps.vars.outputs.all }}  
+    steps:
+      - name: Setup matrix combinations
+        id: vars
+        run:
+          echo "all=[{\"col\":\"red\",\"id\":\"23\"},{\"col\":\"red\",\"id\":\"24\"}]" >> ${GITHUB_OUTPUT}
 
   attest:
     needs: setup-matrix
