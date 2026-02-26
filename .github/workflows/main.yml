@@ -13,28 +13,45 @@ jobs:
       - id: set-matrix
         run: echo "matrix={\"include\":[{\"colour\":\"red\"},{\"colour\":\"blue\"}]}" >> ${GITHUB_OUTPUT}
 
-  job2:
+  find:
     needs: job1
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}
-    outputs:
-      colour: ${{ steps.colour.output.value }}
-      ids: ${{ steps.snyk.outputs.ids }}      
     steps:
-      - name: Set colour
-        id: colour
-        run:
-          echo "value=${{ matrix.colour }}" >> ${GITHUB_OUTPUT}
-
       - name: Find snyk vulns
-        id: snyk
         run:
-          echo "ids=[\"SNYK-234\",\"SNYK-567\"]" >> ${GITHUB_OUTPUT}
+          echo "IDS=[\"SNYK-234\",\"SNYK-567\"]" >> ${GITHUB_ENV}
 
-  job3:
-    needs: job2
-    uses: cyber-dojo/ci-testing/.github/workflows/splicer.yml@main
-    with:
-      colour: "${{ needs.job3.outputs.colour }}"
-      ids: "${{ needs.job3.outputs.ids }}"
+      - name: Set outcome
+        run:
+          jq -cn  --arg colour ${{ matrix.colour }} --arg ids ${{ env.IDS }} '$ARGS.named' > outcome
+
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ hashFiles('outcome') }}
+          path: outcome
+
+
+  collect:
+    needs: find
+    runs-on: ubuntu-latest
+    outputs:
+      outcomes: ${{ steps.collect.outputs.outcomes }}
+    steps:
+      - uses: actions/download-artifact@v4
+      - id: collect
+        run: |
+          outcomes="$(cat */outcome | jq -c --slurp .)"
+          echo outcomes=$outcomes >> $GITHUB_OUTPUT
+
+
+  show:
+    needs: collect
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.collect.outputs.outcomes) }}
+    steps:
+      - run: echo ${{ matrix.colour }} ${{ matrix.ids }}
+
