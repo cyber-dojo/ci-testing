@@ -30,8 +30,10 @@ jobs:
           fi
 
       - name: Splice vulns
-        run:
-          jq --compact-output "map(. + {colour: \"${{ matrix.colour }}\"})" ids.json > vulns
+        run: |
+          cat ids.json
+          colour="${{ matrix.colour }}"
+          jq --compact-output "map(. + {colour: \"${colour}\"})" ids.json > vulns
 
       - uses: actions/upload-artifact@v4
         with:
