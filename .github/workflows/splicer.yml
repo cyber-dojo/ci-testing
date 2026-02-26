@@ -1,0 +1,33 @@
+name: Splicer
+
+on:
+  workflow_call:
+    inputs:
+      colour:
+        description: "Single colour"
+        required: true
+      ids:
+        description: "List of vuln ids"
+        required: true
+
+jobs:
+  setup-matrix:
+    runs-on: ubuntu-latest
+  outputs:
+    matrix-combinations: ${{ steps.vars.outputs.all }}  
+  steps:
+    - name: Setup matrix combinations
+      id: vars
+      run:
+        echo "all=[{\"col\":\"red\",\"id\":\"23\"},{\"col\":\"red\",\"id\":\"24\"}]" >> ${GITHUB_OUTPUT}
+
+  attest:
+    needs: setup-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.setup-matrix.outputs.matrix-combinations) }}    
+    steps:
+      - name: Print
+        run: |
+          echo ${{ matrix.col }}
+          echo ${{ matrix.id }}

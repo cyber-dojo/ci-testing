@@ -16,22 +16,15 @@ jobs:
   job2:
     needs: job1
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}    
     steps:
-      - id: set-matrix
-        run: echo "matrix={\"include\":[{\"colour\":\"${{matrix.colour}}\",\"id\":\"SNYK-234\"},{\"colour\":\"${{matrix.colour}}\",\"id\":\"SNYK-567\"}]}" >> $GITHUB_OUTPUT
+      - name: Find snyk vulns
+        run:
+          echo "IDS=[\"SNYK-234\",\"SNYK-567\"]" >> ${GITHUB_ENV}
 
-  job3:
-    needs: job2
-    runs-on: ubuntu-latest
-    #outputs:
-    #  matrix: ${{ steps.set-matrix.outputs.matrix }}
-    strategy:
-      matrix: ${{ fromJSON(needs.job2.outputs.matrix) }}    
-    steps:
-      - name: Two levels deep
-        run: echo "${{matrix.colour}} ${{matrix.id}}"
-
+      - name: Call resuable workflow
+        uses: cyber-dojo/ci-testing/.github/workflows/splicer.yml@main
+        with:
+          colour: "${{ matrix.colour }}"
+          ids: "${{ env.IDS }}"
