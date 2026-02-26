@@ -6,53 +6,54 @@ on:
 
 jobs:
 
-  job1:
+  find-artifacts:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      artifacts: ${{ steps.set-artifacts.outputs.artifacts }}
     steps:
-      - id: set-matrix
-        run: echo "matrix={\"include\":[{\"colour\":\"red\"},{\"colour\":\"blue\"}]}" >> ${GITHUB_OUTPUT}
+      - id: set-artifacts
+        run: echo "artifacts={\"include\":[{\"colour\":\"red\"},{\"colour\":\"blue\"}]}" >> ${GITHUB_OUTPUT}
 
-  find:
-    needs: job1
+
+  find-vulns:
+    needs: find-artifacts
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
     steps:
       - name: Find snyk vulns
         run:
           echo "IDS=[\"SNYK-234\",\"SNYK-567\"]" >> ${GITHUB_ENV}
 
-      - name: Set outcome
+      - name: Splice vulns
         run:
-          jq -cn  --arg colour ${{ matrix.colour }} --arg ids ${{ env.IDS }} '$ARGS.named' > outcome
+          jq -cn  --arg colour ${{ matrix.colour }} --arg ids ${{ env.IDS }} '$ARGS.named' > vulns
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ hashFiles('outcome') }}
-          path: outcome
+          name: ${{ hashFiles('vulns') }}
+          path: vulns
 
 
-  collect:
-    needs: find
+  collect-vulns:
+    needs: find-vulns
     runs-on: ubuntu-latest
     outputs:
-      outcomes: ${{ steps.collect.outputs.outcomes }}
+      vulns: ${{ steps.set-vulns.outputs.vulns }}
     steps:
       - uses: actions/download-artifact@v4
-      - id: collect
+      - id: set-vulns
         run: |
-          outcomes="$(cat */outcome | jq -c --slurp .)"
-          echo outcomes=$outcomes >> $GITHUB_OUTPUT
+          vulns="$(cat */vulns | jq -c --slurp .)"
+          echo vulns=${vulns} >> $GITHUB_OUTPUT
 
 
-  show:
-    needs: collect
+  attest:
+    needs: collect-vulns
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include: ${{ fromJSON(needs.collect.outputs.outcomes) }}
+        include: ${{ fromJSON(needs.collect-vulns.outputs.vulns) }}
     steps:
       - run: echo ${{ matrix.colour }} ${{ matrix.ids }}
 
