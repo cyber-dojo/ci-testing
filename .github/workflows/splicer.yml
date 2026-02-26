@@ -27,7 +27,8 @@ jobs:
     needs: setup-matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.setup-matrix.outputs.matrix-combinations) }}    
+      matrix:
+        object: ${{ fromJson(needs.setup-matrix.outputs.matrix-combinations) }}    
     steps:
       - name: Print
         run: |
