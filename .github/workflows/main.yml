@@ -34,7 +34,6 @@ jobs:
 
   job3:
     needs: job2
-    runs-on: ubuntu-latest
     uses: cyber-dojo/ci-testing/.github/workflows/splicer.yml@main
     with:
       colour: "${{ needs.job3.outputs.colour }}"
