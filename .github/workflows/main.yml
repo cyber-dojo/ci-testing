@@ -12,29 +12,28 @@ jobs:
       artifacts: ${{ steps.set-artifacts.outputs.artifacts }}
     steps:
       - id: set-artifacts
-        run: echo "artifacts={\"include\":[{\"colour\":\"red\"},{\"colour\":\"blue\"}]}" >> ${GITHUB_OUTPUT}
+        run: echo "artifacts=[{\"colour\":\"red\"},{\"colour\":\"blue\"}]" >> ${GITHUB_OUTPUT}
 
 
   find-vulns:
     needs: find-artifacts
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
+      matrix:
+        include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
     steps:
       - name: Find snyk vulns
         run: |
           if [ "${{ matrix.colour }}" == 'red' ]; then
-            echo "[{\"id\":\"SNYK-A4\"},{\"id\":\"SNYK-A7\"}]" > ids.json
+            echo "[{\"id\":\"SNYK-A4\"},{\"id\":\"SNYK-A7\"}]" > snyk-ids.json
           else
-            echo "[{\"id\":\"SNYK-B9\"},{\"id\":\"SNYK-X2\"}]" > ids.json
+            echo "[{\"id\":\"SNYK-B9\"},{\"id\":\"SNYK-X2\"}]" > snyk-ids.json
           fi
 
       - name: Splice vulns
         run: |
-          cat ids.json
           colour="${{ matrix.colour }}"
-          jq --compact-output "map(. + {colour: \"${colour}\"})" ids.json > vulns
-          cat vulns
+          jq --compact-output "map(. + {colour: \"${colour}\"})" snyk-ids.json > vulns
 
       - uses: actions/upload-artifact@v4
         with:
@@ -52,11 +51,10 @@ jobs:
       - id: set-vulns
         run: |
           vulns="$(cat */vulns | jq --compact-output --slurp add)"
-          echo "vulns=:${vulns}:"
-          echo vulns=${vulns} >> $GITHUB_OUTPUT
+          echo "vulns=${vulns}" >> $GITHUB_OUTPUT
 
 
-  attest:
+  attest-vulns:
     needs: collect-vulns
     runs-on: ubuntu-latest
     strategy:
