@@ -5,33 +5,32 @@ on:
 
 jobs:
 
-  snyk-code-scan:
+  job1:
     runs-on: ubuntu-latest
-    needs: []
-    env:
-      SARIF_FILENAME: snyk.code.scan.json
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - id: set-matrix
+        run: echo "matrix={\"include\":[{\"colour\":\"red\"},{\"colour\":\"blue\"}]}" >> $GITHUB_OUTPUT
 
-      - name: Show repo url
-        run:
-          echo "X ${{ github.server_url }}/${{ github.repository_owner }} X"
+  job2:
+    needs: job1
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}    
+    steps:
+      - id: set-matrix
+        run: echo "matrix={\"include\":[{\"colour\":\"${{matrix.colour}}\"},{\"id\":\"SNYK-234\"},{\"colour\":\"${{matrix.colour}}\"},{\"id\":\"SNYK-567\"}]}" >> $GITHUB_OUTPUT
 
-      - name: Setup Snyk
-        uses: snyk/actions/setup@master
-
-      - name: Run Snyk code scan
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: |
-          set +e
-          snyk code test \
-            --policy-path=.snyk \
-            --sarif \
-            --sarif-file-output="${SARIF_FILENAME}" \
-            ./bad_dir
-          STATUS=$?
-          set -e 
-          echo "STATUS=:${STATUS}:"
-          cat "${SARIF_FILENAME}"
+  job3:
+    needs: job2
+    runs-on: ubuntu-latest
+    #outputs:
+    #  matrix: ${{ steps.set-matrix.outputs.matrix }}
+    strategy:
+      matrix: ${{ fromJSON(needs.job2.outputs.matrix) }}    
+    steps:
+      run: echo "${{matrix.colour}} ${{matrix.id}}"
 
