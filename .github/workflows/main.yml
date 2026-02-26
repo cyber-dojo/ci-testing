@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Find snyk vulns
         run: |
-          if [ "${{ matrix.colour }}" == red ]; then
+          if [ "${{ matrix.colour }}" == 'red' ]; then
             echo "[{\"id\":\"SNYK-A4\"},{\"id\":\"SNYK-A7\"}]" > ids.json
           else
             echo "[{\"id\":\"SNYK-B9\"},{\"id\":\"SNYK-X2\"}]" > ids.json
@@ -34,6 +34,7 @@ jobs:
           cat ids.json
           colour="${{ matrix.colour }}"
           jq --compact-output "map(. + {colour: \"${colour}\"})" ids.json > vulns
+          cat vulns
 
       - uses: actions/upload-artifact@v4
         with:
@@ -51,6 +52,7 @@ jobs:
       - id: set-vulns
         run: |
           vulns="$(cat */vulns | jq -c --slurp .)"
+          echo "vulns=:${vulns}:"
           echo vulns=${vulns} >> $GITHUB_OUTPUT
 
 
