@@ -6,9 +6,11 @@ on:
       colour:
         description: "Single colour"
         required: true
+        type: string
       ids:
         description: "List of vuln ids"
         required: true
+        type: string
 
 jobs:
   setup-matrix:
