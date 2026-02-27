@@ -31,7 +31,7 @@ jobs:
             --compact-output \
             --arg colour     "${{ inputs.colour     }}" \
             --arg kosli_flow "${{ inputs.kosli_flow }}" \
-            '. += $ARGS.named' <<< '{}')
+            '. += $ARGS.named' <<< '{}')"
             
           jq --compact-output "map(. + ${artifact})" snyk-ids.json > vulns
 
