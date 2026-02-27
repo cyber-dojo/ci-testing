@@ -28,6 +28,8 @@ jobs:
         include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
     uses: cyber-dojo/ci-testing/.github/workflows/snyk.yml@main
     with:
-      colour: ${{ matrix.colour }}
+      name: ${{ matrix.name }}
+      fingerprint: ${{ matrix.fingerprint }}
+      repo: ${{ matrix.repo }}
+      commit: ${{ matrix.commit }}
       kosli_flow: ${{ matrix.kosli_flow }}
-      matrix: ${{ toJSON(matrix) }}

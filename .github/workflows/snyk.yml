@@ -3,12 +3,20 @@ name: Snyk
 on:
   workflow_call:
     inputs:
-      matrix:
-        description: "All args"
+      name:
+        description: "Artifact name"
         required: true
         type: string
-      colour:
-        description: "Will be artifact"
+      fingerprint:
+        description: "Artifact fingerprint"
+        required: true
+        type: string
+      repo:
+        description: "Artifact repo"
+        required: true
+        type: string
+      commit:
+        description: "Artifact commit"
         required: true
         type: string
       kosli_flow:
@@ -27,19 +35,18 @@ jobs:
 
       - name: Simulate running snyk
         run:
-          cp snyk-${{ inputs.colour }}.json snyk-ids.json
+          cp snyk-${{ inputs.repo }}.json snyk-ids.json
 
-      - name: Splice colour into each snyk vuln
+      - name: Splice artifact into each snyk vuln
         run: |
-          echo ":${{ inputs.matrix }}:"
-          echo "~${{ fromJSON(toJSON(inputs.matrix)) }}~"
-
-          #artifact="$(jq \
-          #  --compact-output \
-          #  --arg colour     "${{ inputs.colour     }}" \
-          #  --arg kosli_flow "${{ inputs.kosli_flow }}" \
-          #  '. += $ARGS.named' <<< '{}')"
-          artifact="$(jq --compact-output . <<< "${{ fromJSON(inputs.matrix) }}")"
+          artifact="$(jq \
+            --compact-output \
+            --arg name        "${{ inputs.name        }}" \
+            --arg fingerprint "${{ inputs.fingerprint }}" \
+            --arg repo        "${{ inputs.repo        }}" \
+            --arg commit      "${{ inputs.commit      }}" \
+            --arg kosli_flow  "${{ inputs.kosli_flow  }}" \
+            '. += $ARGS.named' <<< '{}')"
             
           jq --compact-output "map(. + ${artifact})" snyk-ids.json > vulns
 
@@ -72,8 +79,11 @@ jobs:
     steps:
       - name: Print
         run: |
+          echo ${{ matrix.name }}
+          echo ${{ matrix.fingerprint }}
+          echo ${{ matrix.repo }}
+          echo ${{ matrix.commit }}
           echo ${{ matrix.kosli_flow }}
-          echo ${{ matrix.colour }}
           echo ${{ matrix.severity }}
           echo ${{ matrix.id }}
 
