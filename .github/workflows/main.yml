@@ -30,4 +30,4 @@ jobs:
     with:
       colour: ${{ matrix.colour }}
       kosli_flow: ${{ matrix.kosli_flow }}
-      matrix: ${{ fromJSON(matrix) }}
+      matrix: ${{ toJSON(matrix) }}
