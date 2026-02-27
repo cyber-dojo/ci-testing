@@ -44,8 +44,10 @@ jobs:
           cat */vulns | jq --compact-output --slurp add > all-vulns
           jq . all-vulns
           jq --compact-output '.[] | select(.colour == "${{ inputs.colour }}")' all-vulns > colour-vulns
-          jq . colour-vulns
-          echo "vulns=[$(cat colour-vulns)]" >> $GITHUB_OUTPUT
+          jq -c . colour-vulns
+          vulns="[$(cat colour-vulns)]"
+          echo ":${vulns}:"
+          echo "vulns=$vulns" >> $GITHUB_OUTPUT
 
 
   attest-snyk-vulns:
