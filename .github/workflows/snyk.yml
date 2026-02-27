@@ -28,7 +28,7 @@ jobs:
       - name: Splice colour into each snyk vuln
         run: |
           colour="${{ inputs.colour }}"
-          flow="${{ inputs.kosli_flow }}"
+          kosli_flow="${{ inputs.kosli_flow }}"
           artifact="{\"colour\":\"${colour}\",\"kosli_flow\":\"${kosli_flow}\"}"
           jq --compact-output "map(. + ${artifact})" snyk-ids.json > vulns
 
