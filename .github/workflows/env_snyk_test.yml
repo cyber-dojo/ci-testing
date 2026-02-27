@@ -38,7 +38,7 @@ jobs:
     strategy:
       matrix:
         include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
-    uses: ./.github/workflows/artifact_snyk_test.yml@main
+    uses: ./.github/workflows/artifact_snyk_test.yml
     with:
       name: ${{ matrix.name }}
       fingerprint: ${{ matrix.fingerprint }}
