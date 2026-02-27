@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include: ${{ fromJSON(needs.collect-vulns.outputs.vulns) }}
+        include: ${{ fromJSON(needs.collect-snyk-vulns.outputs.vulns) }}
     steps:
       - name: Print
         run: |
