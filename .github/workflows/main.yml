@@ -11,8 +11,14 @@ jobs:
     outputs:
       artifacts: ${{ steps.set-artifacts.outputs.artifacts }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - id: set-artifacts
-        run: echo "artifacts=[{\"colour\":\"red\"},{\"colour\":\"blue\"}]" >> ${GITHUB_OUTPUT}
+        run: |
+          artifact="$(jq --compact-output artifacts.json)"
+          echo "artifacts=${artifacts}" >> ${GITHUB_OUTPUT}
 
 
   artifact-snyk:
@@ -22,4 +28,5 @@ jobs:
         include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
     uses: cyber-dojo/ci-testing/.github/workflows/snyk.yml@main
     with:
-      matrix: ${{ matrix }}
+      colour: ${{ matrix.colour }}
+      kosli_flow: ${{ matrix.kosli_flow }}
