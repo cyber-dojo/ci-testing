@@ -1,4 +1,4 @@
-name: Snyk
+name: Artifact Snyk Test
 
 on:
   workflow_call:
@@ -59,7 +59,7 @@ jobs:
             --arg fingerprint "${{ inputs.fingerprint }}" \
             --arg repo        "${{ inputs.repo        }}" \
             --arg commit      "${{ inputs.commit      }}" \
-            --arg kosli_env   "${{ inputs.kosli_env  }}" \
+            --arg kosli_env   "${{ inputs.kosli_env   }}" \
             '. += $ARGS.named' <<< '{}')"
             
           jq --compact-output "map(. + ${artifact})" snyk-ids.json > vulns
@@ -98,6 +98,6 @@ jobs:
           echo ${{ matrix.repo }}
           echo ${{ matrix.commit }}
           echo ${{ matrix.kosli_env }}
-          echo ${{ matrix.severity }}
           echo ${{ matrix.id }}
+          echo ${{ matrix.severity }}
 

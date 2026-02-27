@@ -1,38 +1,26 @@
-name: Main
-# https://stackoverflow.com/questions/78915275/how-can-i-capture-the-results-of-matrix-jobs-in-a-github-actions-workflow
+name: Live Snyk Test
 
 on:
+  #workflow_dispatch:
   push:
+  #schedule: # At 08:00 every day
+  #  - cron: '0 8 * * *'
 
 jobs:
-
-  find-artifacts:
-    runs-on: ubuntu-latest
-    outputs:
-      artifacts: ${{ steps.set-artifacts.outputs.artifacts }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - id: set-artifacts
-        run: |
-          artifacts="$(jq --compact-output . artifacts.json)"
-          echo "artifacts=${artifacts}" >> ${GITHUB_OUTPUT}
-
-
-  artifact-snyk:
-    needs: find-artifacts
-    strategy:
-      matrix:
-        include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
-    uses: cyber-dojo/ci-testing/.github/workflows/snyk.yml@main
+  trigger-aws-beta:
+    needs: []
+    uses: ./.github/workflows/env_snyk_test.yml
     with:
-      name: ${{ matrix.name }}
-      fingerprint: ${{ matrix.fingerprint }}
-      repo: ${{ matrix.repo }}
-      commit: ${{ matrix.commit }}
       kosli_env: aws-beta
     secrets:
+      snyk_token:      ${{ secrets.SNYK_TOKEN }}
       kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
-      snyk_token: ${{ secrets.SNYK_TOKEN }}
+
+  trigger-aws-prod:
+    needs: []
+    uses: ./.github/workflows/env_snyk_test.yml
+    with:
+      kosli_env: aws-prod
+    secrets:
+      snyk_token:      ${{ secrets.SNYK_TOKEN }}
+      kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}

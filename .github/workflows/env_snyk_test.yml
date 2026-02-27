@@ -1,0 +1,50 @@
+name: Environment Snyk Test
+# https://stackoverflow.com/questions/78915275/how-can-i-capture-the-results-of-matrix-jobs-in-a-github-actions-workflow
+
+on:
+  workflow_call:
+    secrets:
+      kosli_api_token:
+        required: true
+      snyk_token:
+        required: true
+
+    inputs:
+      kosli_env:
+        description: "Name of Kosli environment to find artifact running in"
+        required: true
+        type: string
+
+jobs:
+
+  find-artifacts:
+    runs-on: ubuntu-latest
+    outputs:
+      artifacts: ${{ steps.set-artifacts.outputs.artifacts }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - id: set-artifacts
+        run: |
+          # Fake getting snapshot from Kosli
+          artifacts="$(jq --compact-output . artifacts-${{ inputs.kosli_env }}.json)"
+          echo "artifacts=${artifacts}" >> ${GITHUB_OUTPUT}
+
+
+  artifact-snyk:
+    needs: find-artifacts
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
+    uses: ./.github/workflows/artifact_snyk_test.yml@main
+    with:
+      name: ${{ matrix.name }}
+      fingerprint: ${{ matrix.fingerprint }}
+      repo: ${{ matrix.repo }}
+      commit: ${{ matrix.commit }}
+      kosli_env: ${{ inputs.kosli_env }}
+    secrets:
+      kosli_api_token: ${{ secrets.kosli_api_token }}
+      snyk_token: ${{ secrets.snyk_token }}
