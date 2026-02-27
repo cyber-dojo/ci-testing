@@ -17,7 +17,7 @@ jobs:
 
       - id: set-artifacts
         run: |
-          artifact="$(jq --compact-output artifacts.json)"
+          artifact="$(jq --compact-output . artifacts.json)"
           echo "artifacts=${artifacts}" >> ${GITHUB_OUTPUT}
 
 
