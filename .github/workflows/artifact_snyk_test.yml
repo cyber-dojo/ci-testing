@@ -47,11 +47,11 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Simulate running snyk
+      - name: Simulate running snyk and extracting json from sarif file
         run:
           cp snyk-${{ inputs.repo }}.json snyk-ids.json
 
-      - name: Splice artifact into each snyk vuln
+      - name: Merge artifact json into each snyk vuln json
         run: |
           artifact="$(jq \
             --compact-output \
