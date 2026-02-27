@@ -1,0 +1,10 @@
+[
+    {
+        "id": "SNYK-A4",
+        "severity": "Medium"
+    },
+    {
+        "id": "SNYK-A7",
+        "severity": "Low"
+    }
+]

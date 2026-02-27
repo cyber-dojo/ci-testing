@@ -18,12 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Simulate running snyk
-        run: |
-          if [ "${{ inputs.colour }}" == 'red' ]; then
-            echo "[{\"id\":\"SNYK-A4\"},{\"id\":\"SNYK-A7\"}]" > snyk-ids.json
-          else
-            echo "[{\"id\":\"SNYK-B9\"},{\"id\":\"SNYK-X2\"}]" > snyk-ids.json
-          fi
+        run:
+          cp snyk-${{ inputs.colour }}.json snyk-ids.json
 
       - name: Splice colour into each snyk vuln
         run: |
