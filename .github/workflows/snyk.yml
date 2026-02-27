@@ -66,7 +66,7 @@ jobs:
       - id: set-vulns
         run: |
           cat */vulns | jq --compact-output --slurp add > all-vulns
-          vulns="$(jq --compact-output 'map(. | select(.colour == "${{ inputs.colour }}"))' all-vulns)"
+          vulns="$(jq --compact-output 'map(. | select(.fingerprint == "${{ inputs.fingerprint }}"))' all-vulns)"
           echo "vulns=${vulns}" >> $GITHUB_OUTPUT
 
 
