@@ -42,7 +42,9 @@ jobs:
       - id: set-vulns
         run: |
           cat */vulns | jq --compact-output --slurp add > all-vulns
+          jq . all-vulns
           jq --compact-output '.[] | select(.colour == "${{ inputs.colour }}")' all-vulns > colour-vulns
+          jq . colour-vulns
           echo "vulns=$(cat colour-vulns)" >> $GITHUB_OUTPUT
 
 
