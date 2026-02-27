@@ -3,7 +3,7 @@ name: Snyk
 on:
   workflow_call:
     inputs:
-      colour:
+      matrix:
         description: "Will be artifact"
         required: true
         type: string
@@ -23,8 +23,11 @@ jobs:
 
       - name: Splice colour into each snyk vuln
         run: |
-          colour="${{ inputs.colour }}"
-          jq --compact-output "map(. + {colour: \"${colour}\"})" snyk-ids.json > vulns
+          #colour="${{ inputs.colour }}"
+          matrix="${{ inputs.matrix }}"
+          echo ":${matrix}:"
+          #jq --compact-output "map(. + {colour: \"${colour}\"})" snyk-ids.json > vulns
+          jq --compact-output "map(. + ${matrix})" snyk-ids.json > vulns
 
       - uses: actions/upload-artifact@v4
         with:

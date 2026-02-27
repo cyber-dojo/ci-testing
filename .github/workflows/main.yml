@@ -22,4 +22,4 @@ jobs:
         include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
     uses: cyber-dojo/ci-testing/.github/workflows/snyk.yml@main
     with:
-      colour: ${{ matrix.colour }}
+      matrix: ${{ matrix }}
