@@ -32,4 +32,7 @@ jobs:
       fingerprint: ${{ matrix.fingerprint }}
       repo: ${{ matrix.repo }}
       commit: ${{ matrix.commit }}
-      kosli_flow: ${{ matrix.kosli_flow }}
+      kosli_env: aws-beta
+    secrets:
+      kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
+      snyk_token: ${{ secrets.SNYK_TOKEN }}

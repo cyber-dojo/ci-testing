@@ -2,6 +2,12 @@ name: Snyk
 
 on:
   workflow_call:
+    secrets:
+      kosli_api_token:
+        required: true
+      snyk_token:
+        required: true
+
     inputs:
       name:
         description: "Artifact name"
@@ -19,10 +25,18 @@ on:
         description: "Artifact commit"
         required: true
         type: string
-      kosli_flow:
-        description: "Name of the kosli flow"
+      kosli_env:
+        description: "Name of Kosli environment the artifact is running in"
         required: true
         type: string
+
+
+env:
+  KOSLI_API_TOKEN: ${{ secrets.kosli_api_token }}
+  KOSLI_DEBUG:     ${{ vars.KOSLI_DEBUG }}          # true/false
+  KOSLI_DRY_RUN:   ${{ vars.KOSLI_DRY_RUN }}        # true/false
+  KOSLI_HOST:      ${{ vars.KOSLI_HOST }}           # https://app.kosli.com
+  KOSLI_ORG:       ${{ vars.KOSLI_ORG }}            # cyber-dojo
 
 
 jobs:
@@ -45,7 +59,7 @@ jobs:
             --arg fingerprint "${{ inputs.fingerprint }}" \
             --arg repo        "${{ inputs.repo        }}" \
             --arg commit      "${{ inputs.commit      }}" \
-            --arg kosli_flow  "${{ inputs.kosli_flow  }}" \
+            --arg kosli_env   "${{ inputs.kosli_env  }}" \
             '. += $ARGS.named' <<< '{}')"
             
           jq --compact-output "map(. + ${artifact})" snyk-ids.json > vulns
@@ -83,7 +97,7 @@ jobs:
           echo ${{ matrix.fingerprint }}
           echo ${{ matrix.repo }}
           echo ${{ matrix.commit }}
-          echo ${{ matrix.kosli_flow }}
+          echo ${{ matrix.kosli_env }}
           echo ${{ matrix.severity }}
           echo ${{ matrix.id }}
 
