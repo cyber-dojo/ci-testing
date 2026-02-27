@@ -15,51 +15,12 @@ jobs:
         run: echo "artifacts=[{\"colour\":\"red\"},{\"colour\":\"blue\"}]" >> ${GITHUB_OUTPUT}
 
 
-  find-vulns:
+  artifact-snyk:
     needs: find-artifacts
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
-    steps:
-      - name: Find snyk vulns
-        run: |
-          if [ "${{ matrix.colour }}" == 'red' ]; then
-            echo "[{\"id\":\"SNYK-A4\"},{\"id\":\"SNYK-A7\"}]" > snyk-ids.json
-          else
-            echo "[{\"id\":\"SNYK-B9\"},{\"id\":\"SNYK-X2\"}]" > snyk-ids.json
-          fi
-
-      - name: Splice vulns
-        run: |
-          colour="${{ matrix.colour }}"
-          jq --compact-output "map(. + {colour: \"${colour}\"})" snyk-ids.json > vulns
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ hashFiles('vulns') }}
-          path: vulns
-
-
-  collect-vulns:
-    needs: find-vulns
-    runs-on: ubuntu-latest
-    outputs:
-      vulns: ${{ steps.set-vulns.outputs.vulns }}
-    steps:
-      - uses: actions/download-artifact@v4
-      - id: set-vulns
-        run: |
-          vulns="$(cat */vulns | jq --compact-output --slurp add)"
-          echo "vulns=${vulns}" >> $GITHUB_OUTPUT
-
-
-  attest-vulns:
-    needs: collect-vulns
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include: ${{ fromJSON(needs.collect-vulns.outputs.vulns) }}
-    steps:
-      - run: echo ${{ matrix.colour }} ${{ matrix.id }}
-
+    uses: cyber-dojo/ci-testing/.github/workflows/snyk.yml@main
+    with:
+      colour: ${{ matrix.colour }}

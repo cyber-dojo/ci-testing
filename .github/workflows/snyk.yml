@@ -1,0 +1,59 @@
+name: Snyk
+
+on:
+  workflow_call:
+    inputs:
+      colour:
+        description: "Will be artifact"
+        required: true
+        type: string
+
+
+jobs:
+  find-snyk-vulns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Simulate running snyk
+        run: |
+          if [ "${{ inputs.colour }}" == 'red' ]; then
+            echo "[{\"id\":\"SNYK-A4\"},{\"id\":\"SNYK-A7\"}]" > snyk-ids.json
+          else
+            echo "[{\"id\":\"SNYK-B9\"},{\"id\":\"SNYK-X2\"}]" > snyk-ids.json
+          fi
+
+      - name: Splice colour into each snyk vuln
+        run: |
+          colour="${{ inputs.colour }}"
+          jq --compact-output "map(. + {colour: \"${colour}\"})" snyk-ids.json > vulns
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ hashFiles('vulns') }}
+          path: vulns
+
+
+  collect-snyk-vulns:
+    needs: find-snyk-vulns
+    runs-on: ubuntu-latest
+    outputs:
+      vulns: ${{ steps.set-vulns.outputs.vulns }}
+    steps:
+      - uses: actions/download-artifact@v4
+      - id: set-vulns
+        run: |
+          vulns="$(cat */vulns | jq --compact-output --slurp add)"
+          echo "vulns=${vulns}" >> $GITHUB_OUTPUT
+
+
+  attest-snyk-vulns:
+    needs: collect-snyk-vulns
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.collect-vulns.outputs.vulns) }}
+    steps:
+      - name: Print
+        run: |
+          echo ${{ matrix.colour }}
+          echo ${{ matrix.id }}
+
