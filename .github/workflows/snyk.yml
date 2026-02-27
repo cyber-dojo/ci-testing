@@ -24,11 +24,11 @@ jobs:
       - name: Splice colour into each snyk vuln
         run: |
           colour="${{ inputs.colour }}"
-          jq --compact-output "map(. + {colour: \"${colour}\"})" snyk-ids.json > vulns
+          jq --compact-output "map(. + {colour: \"${colour}\"})" snyk-ids.json > ${{ inputs.colour }}-vulns
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ hashFiles('vulns') }}
+          name: ${{ hashFiles('${{ inputs.colour }}-vulns') }}
           path: ${{ inputs.colour }}-vulns
 
 
