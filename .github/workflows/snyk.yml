@@ -32,7 +32,7 @@ jobs:
       - name: Splice colour into each snyk vuln
         run: |
           echo ":${{ inputs.matrix }}:"
-          echo "~${{ toJSON(fromJSON(inputs.matrix)) }}~"
+          echo "~${{ fromJSON(toJSON(inputs.matrix)) }}~"
 
           #artifact="$(jq \
           #  --compact-output \
