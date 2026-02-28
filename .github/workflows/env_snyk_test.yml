@@ -20,6 +20,13 @@ on:
         required: true
         type: string
 
+env:
+  KOSLI_API_TOKEN: ${{ secrets.kosli_api_token }}
+  KOSLI_DEBUG:     ${{ vars.KOSLI_DEBUG }}          # true/false
+  KOSLI_DRY_RUN:   ${{ vars.KOSLI_DRY_RUN }}        # true/false
+  KOSLI_HOST:      ${{ vars.KOSLI_HOST }}           # https://app.kosli.com
+  KOSLI_ORG:       ${{ vars.KOSLI_ORG }}            # cyber-dojo
+
 jobs:
 
   find-artifacts:
@@ -36,15 +43,17 @@ jobs:
         with:
           version: ${{ vars.KOSLI_CLI_VERSION }}
 
-      # kosli get snapshot
-      # process snapshot
+      #- id: set-artifacts
+      - name: Generate JSON for each Artifact in KOSLI_ENV for following job's strategy:matrix:include
+        run: |
+          echo "artifacts=$(make artifacts | jq --raw-output --compact-output .)" >> ${GITHUB_OUTPUT}
+          #TODO: For test, filter so we only get the one artifact used in fake snyk-test
 
       - id: set-artifacts
         run: |
           # Fake getting snapshot from kosli_env
           artifacts="$(jq --compact-output . artifacts-${{ inputs.kosli_env }}.json)"
           echo "artifacts=${artifacts}" >> ${GITHUB_OUTPUT}
-
 
   artifact-snyk:
     needs: find-artifacts
@@ -55,8 +64,10 @@ jobs:
     with:
       artifact_name:        ${{ matrix.artifact_name }}
       artifact_fingerprint: ${{ matrix.artifact_fingerprint }}
-      artifact_repo:        ${{ matrix.artifact_repo }}
-      artifact_commit:      ${{ matrix.artifact_commit }}
+      artifact_repo_name:   ${{ matrix.repo_name }}
+      artifact_git_commit:  ${{ matrix.git_commit }}
+      artifact_commit_url:  ${{ matrix.commit_url }}
+      raw_snyk_file_url:    ${{ matrix.raw_snyk_file_url }}
       kosli_env:            ${{ inputs.kosli_env }}
       kosli_flow:           ${{ inputs.kosli_flow }}
     secrets:
