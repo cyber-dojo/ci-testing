@@ -93,7 +93,6 @@ jobs:
             'map(. | select(.artifact_fingerprint == $af and .kosli_env == $ke))' \
             all-vulns)"
           
-          echo "vulns=:${vulns}:"
           echo "vulns=${vulns}" >> $GITHUB_OUTPUT
 
 
