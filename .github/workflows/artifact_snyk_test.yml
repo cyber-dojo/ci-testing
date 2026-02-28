@@ -3,9 +3,11 @@ name: Artifact Snyk Test
 on:
   workflow_call:
     secrets:
-      kosli_api_token:
+      snyk_org_id:
         required: true
       snyk_token:
+        required: true
+      kosli_api_token:
         required: true
 
     inputs:
@@ -46,7 +48,39 @@ env:
 jobs:
   find-snyk-vulns:
     runs-on: ubuntu-latest
+    env:
+      SNYK_SARIF_FILENAME: snyk.container.test.json
     steps:
+      - name: Setup Snyk
+        uses: snyk/actions/setup@master
+        with:
+          snyk-version: v1.1300.2
+
+      - name: Fail if the sarif file already exists
+        run: |
+          if test -f "${SNYK_SARIF_FILENAME}" ; then
+            echo "ERROR: ${SNYK_SARIF_FILENAME} already exists"
+            exit 42
+          fi
+
+      # - name: Run Snyk container test
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.snyk_token }}
+      #     SNYK_ORG_ID: ${{ secrets.snyk_org_id }}
+      #     ARTIFACT_NAME: ${{ inputs.artifact_name }}
+      #   run:
+      #     snyk container test "${ARTIFACT_NAME}"
+      #       --org="${SNYK_ORG_ID}"
+      #       --sarif
+      #       --sarif-file-output="${SNYK_SARIF_FILENAME}"
+
+      # - name: Fail if the sarif file is not created
+      #   run: |
+      #     if ! test -f "${SNYK_SARIF_FILENAME}" ; then
+      #       echo "ERROR: ${SNYK_SARIF_FILENAME} was not created"
+      #       exit 43
+      #     fi
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -63,8 +97,8 @@ jobs:
             --arg artifact_fingerprint "${{ inputs.artifact_fingerprint }}" \
             --arg artifact_repo        "${{ inputs.artifact_repo        }}" \
             --arg artifact_commit      "${{ inputs.artifact_commit      }}" \
-            --arg kosli_env            "${{ inputs.kosli_env  }}" \
-            --arg kosli_flow           "${{ inputs.kosli_flow }}" \
+            --arg kosli_env            "${{ inputs.kosli_env            }}" \
+            --arg kosli_flow           "${{ inputs.kosli_flow           }}" \
             '. += $ARGS.named' <<< '{}')"
             
           jq --compact-output "map(. + ${artifact})" snyk-ids.json > vulns
@@ -78,18 +112,22 @@ jobs:
   collect-snyk-vulns:
     needs: find-snyk-vulns
     runs-on: ubuntu-latest
+    env:
+      ARTIFACT_FINGERPRINT: ${{ inputs.artifact_fingerprint }}
+      KOSLI_ENV:            ${{ inputs.kosli_env }}
     outputs:
       vulns: ${{ steps.set-vulns.outputs.vulns }}
     steps:
       - uses: actions/download-artifact@v4
+
       - id: set-vulns
         run: |
           cat */vulns | jq --compact-output --slurp add > all-vulns
           
           vulns="$(jq \
             --compact-output \
-            --arg af "${{ inputs.artifact_fingerprint }}" \
-            --arg ke "${{ inputs.kosli_env }}"            \
+            --arg af "${ARTIFACT_FINGERPRINT}" \
+            --arg ke "${KOSLI_ENV}"            \
             'map(. | select(.artifact_fingerprint == $af and .kosli_env == $ke))' \
             all-vulns)"
           
@@ -103,6 +141,11 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.collect-snyk-vulns.outputs.vulns) }}
     steps:
+      - name: Setup Kosli CLI
+        uses: kosli-dev/setup-cli-action@v2
+        with:
+          version: ${{ vars.KOSLI_CLI_VERSION }}
+
       - name: Attest evidence to Kosli
         run: |
           echo ${{ matrix.artifact_name }}
