@@ -94,7 +94,7 @@ jobs:
           filter="map(. | select(${filter}))"
           filter="'" + "${filter}" + "'"
           
-          vulns="$(jq --compact-output ${filter} all-vulns)"
+          vulns="$(jq --compact-output "${filter}" all-vulns)"
           
           echo "vulns=${vulns}" >> $GITHUB_OUTPUT
 
