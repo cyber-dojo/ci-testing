@@ -90,8 +90,11 @@ jobs:
           filter+=".artifact_fingerprint == ${{ inputs.artifact_fingerprint }}"
           filter+=" and "
           filter+=".kosli_env            == ${{ inputs.kosli_env }}"
+
+          filter="map(. | select(${filter}))"
+          filter="'" + "${filter}" + "'"
           
-          vulns="$(jq --compact-output 'map(. | select(${filter}))' all-vulns)"
+          vulns="$(jq --compact-output ${filter} all-vulns)"
           
           echo "vulns=${vulns}" >> $GITHUB_OUTPUT
 
