@@ -16,7 +16,7 @@ on:
         required: true
         type: string
       artifact_fingerprint:
-        description: "Artifact fingerprint"
+        description: "Artifact fingerprint/digest (64 chars)"
         required: true
         type: string
       artifact_repo_name:
@@ -24,7 +24,11 @@ on:
         required: true
         type: string
       artifact_git_commit:
-        description: "Artifact commit"
+        description: "Artifact commit (40 chars)"
+        required: true
+        type: string
+      artifact_commit_url:
+        description: "Artifact commit URL"
         required: true
         type: string
       raw_snyk_file_url:
@@ -114,7 +118,8 @@ jobs:
             --arg artifact_fingerprint "${{ inputs.artifact_fingerprint }}" \
             --arg artifact_repo_name   "${{ inputs.artifact_repo_name   }}" \
             --arg artifact_git_commit  "${{ inputs.artifact_git_commit  }}" \
-            --arg raw_snyk_file_url    "${{ inputs.raw_snyk_file_url    }}"
+            --arg artifact_commit_url  "${{ inputs.artifact_commit_url  }}" \
+            --arg raw_snyk_file_url    "${{ inputs.raw_snyk_file_url    }}" \
             --arg kosli_env            "${{ inputs.kosli_env            }}" \
             --arg kosli_flow           "${{ inputs.kosli_flow           }}" \
             '. += $ARGS.named' <<< '{}')"
@@ -175,6 +180,7 @@ jobs:
           echo ${{ matrix.artifact_fingerprint }}
           echo ${{ matrix.artifact_repo_name }}
           echo ${{ matrix.artifact_git_commit }}
+          echo ${{ matrix.artifact_commit_url }}
           echo ${{ matrix.raw_snyk_file_url }}
           echo ${{ matrix.kosli_env }}
           echo ${{ matrix.kosli_flow }}
