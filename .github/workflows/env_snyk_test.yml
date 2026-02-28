@@ -14,6 +14,10 @@ on:
         description: "Name of Kosli environment to find artifact running in"
         required: true
         type: string
+      kosli_flow:
+        description: "Name of Kosli flow to attest evidence in"
+        required: true
+        type: string
 
 jobs:
 
@@ -28,7 +32,7 @@ jobs:
 
       - id: set-artifacts
         run: |
-          # Fake getting snapshot from Kosli
+          # Fake getting snapshot from kosli_env
           artifacts="$(jq --compact-output . artifacts-${{ inputs.kosli_env }}.json)"
           echo "artifacts=${artifacts}" >> ${GITHUB_OUTPUT}
 
@@ -40,11 +44,12 @@ jobs:
         include: ${{ fromJSON(needs.find-artifacts.outputs.artifacts) }}
     uses: ./.github/workflows/artifact_snyk_test.yml
     with:
-      name: ${{ matrix.name }}
-      fingerprint: ${{ matrix.fingerprint }}
-      repo: ${{ matrix.repo }}
-      commit: ${{ matrix.commit }}
-      kosli_env: ${{ inputs.kosli_env }}
+      artifact_name:        ${{ matrix.artifact_name }}
+      artifact_fingerprint: ${{ matrix.artifact_fingerprint }}
+      artifact_repo:        ${{ matrix.artifact_repo }}
+      artifact_commit:      ${{ matrix.artifact_commit }}
+      kosli_env:            ${{ inputs.kosli_env }}
+      kosli_flow:           ${{ inputs.kosli_flow }}
     secrets:
       kosli_api_token: ${{ secrets.kosli_api_token }}
-      snyk_token: ${{ secrets.snyk_token }}
+      snyk_token:      ${{ secrets.snyk_token }}

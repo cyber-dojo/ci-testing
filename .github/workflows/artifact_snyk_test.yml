@@ -9,24 +9,28 @@ on:
         required: true
 
     inputs:
-      name:
+      artifact_name:
         description: "Artifact name"
         required: true
         type: string
-      fingerprint:
+      artifact_fingerprint:
         description: "Artifact fingerprint"
         required: true
         type: string
-      repo:
+      artifact_repo:
         description: "Artifact repo"
         required: true
         type: string
-      commit:
+      artifact_commit:
         description: "Artifact commit"
         required: true
         type: string
       kosli_env:
         description: "Name of Kosli environment the artifact is running in"
+        required: true
+        type: string
+      kosli_flow:
+        description: "Name of Kosli flow to attest evidence in"
         required: true
         type: string
 
@@ -49,17 +53,18 @@ jobs:
 
       - name: Simulate running snyk and extracting json from sarif file
         run:
-          cp snyk-${{ inputs.repo }}.json snyk-ids.json
+          cp snyk-${{ inputs.artifact_repo }}.json snyk-ids.json
 
       - name: Merge artifact json into each snyk vuln json
         run: |
           artifact="$(jq \
             --compact-output \
-            --arg name        "${{ inputs.name        }}" \
-            --arg fingerprint "${{ inputs.fingerprint }}" \
-            --arg repo        "${{ inputs.repo        }}" \
-            --arg commit      "${{ inputs.commit      }}" \
-            --arg kosli_env   "${{ inputs.kosli_env   }}" \
+            --arg artifact_name        "${{ inputs.artifact_name        }}" \
+            --arg artifact_fingerprint "${{ inputs.artifact_fingerprint }}" \
+            --arg artifact_repo        "${{ inputs.artifact_repo        }}" \
+            --arg artifact_commit      "${{ inputs.artifact_commit      }}" \
+            --arg kosli_env            "${{ inputs.kosli_env  }}" \
+            --arg kosli_flow           "${{ inputs.kosli_flow }}" \
             '. += $ARGS.named' <<< '{}')"
             
           jq --compact-output "map(. + ${artifact})" snyk-ids.json > vulns
@@ -80,7 +85,14 @@ jobs:
       - id: set-vulns
         run: |
           cat */vulns | jq --compact-output --slurp add > all-vulns
-          vulns="$(jq --compact-output 'map(. | select(.fingerprint == "${{ inputs.fingerprint }}" and .kosli_env == "${{ inputs.kosli_env }}"))' all-vulns)"
+          vulns="$(jq \
+            --compact-output \
+            'map(. | \
+              select(.artifact_fingerprint == "${{ inputs.artifact_fingerprint }}" and \
+                     .kosli_env            == "${{ inputs.kosli_env }}" \
+                    ) \
+                )' \
+            all-vulns)"
           echo "vulns=${vulns}" >> $GITHUB_OUTPUT
 
 
@@ -91,13 +103,14 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.collect-snyk-vulns.outputs.vulns) }}
     steps:
-      - name: Print
+      - name: Attest evidence to Kosli
         run: |
-          echo ${{ matrix.name }}
-          echo ${{ matrix.fingerprint }}
-          echo ${{ matrix.repo }}
-          echo ${{ matrix.commit }}
+          echo ${{ matrix.artifact_name }}
+          echo ${{ matrix.artifact_fingerprint }}
+          echo ${{ matrix.artifact_repo }}
+          echo ${{ matrix.artifact_commit }}
           echo ${{ matrix.kosli_env }}
-          echo ${{ matrix.id }}
-          echo ${{ matrix.severity }}
+          echo ${{ matrix.kosli_flow }}
+          echo ${{ matrix.snyk_id }}
+          echo ${{ matrix.snyk_severity }}
 

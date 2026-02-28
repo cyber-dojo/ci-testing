@@ -12,15 +12,17 @@ jobs:
     uses: ./.github/workflows/env_snyk_test.yml
     with:
       kosli_env: aws-beta
+      kosli_flow: aws-beta-synk-vuln-ages
     secrets:
       snyk_token:      ${{ secrets.SNYK_TOKEN }}
       kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
 
-  trigger-aws-prod:
-    needs: []
-    uses: ./.github/workflows/env_snyk_test.yml
-    with:
-      kosli_env: aws-prod
-    secrets:
-      snyk_token:      ${{ secrets.SNYK_TOKEN }}
-      kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
+  # trigger-aws-prod:
+  #   needs: []
+  #   uses: ./.github/workflows/env_snyk_test.yml
+  #   with:
+  #     kosli_env: aws-prod
+  #     kosli_flow: aws-prod-synk-vuln-ages
+  #   secrets:
+  #     snyk_token:      ${{ secrets.SNYK_TOKEN }}
+  #     kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
