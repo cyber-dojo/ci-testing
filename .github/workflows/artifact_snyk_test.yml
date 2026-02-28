@@ -180,7 +180,7 @@ jobs:
           echo ${{ matrix.artifact_fingerprint }}
           echo ${{ matrix.repo_name }}
           echo ":${{ matrix.git_commit }}:"
-          echo ${{ matrix.commit_url }}
+          echo ":${{ matrix.commit_url }}:"
           echo ${{ matrix.raw_snyk_file_url }}
           echo ${{ matrix.kosli_env }}
           echo ${{ matrix.kosli_flow }}
