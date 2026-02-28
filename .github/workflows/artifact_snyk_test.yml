@@ -14,6 +14,7 @@ on:
       artifact_name:
         description: "Artifact name"
         required: true
+        type: string
       artifact_fingerprint:
         description: "Artifact fingerprint/digest (64 chars)"
         required: true
