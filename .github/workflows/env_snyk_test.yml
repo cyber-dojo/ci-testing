@@ -64,9 +64,9 @@ jobs:
     with:
       artifact_name:        ${{ matrix.artifact_name }}
       artifact_fingerprint: ${{ matrix.artifact_fingerprint }}
-      artifact_repo_name:   ${{ matrix.repo_name }}
-      artifact_git_commit:  ${{ matrix.git_commit }}
-      artifact_commit_url:  ${{ matrix.commit_url }}
+      repo_name:            ${{ matrix.repo_name }}
+      git_commit:           ${{ matrix.git_commit }}
+      commit_url:           ${{ matrix.commit_url }}
       raw_snyk_file_url:    ${{ matrix.raw_snyk_file_url }}
       kosli_env:            ${{ inputs.kosli_env }}
       kosli_flow:           ${{ inputs.kosli_flow }}

@@ -19,15 +19,15 @@ on:
         description: "Artifact fingerprint/digest (64 chars)"
         required: true
         type: string
-      artifact_repo_name:
+      repo_name:
         description: "Artifact repo"
         required: true
         type: string
-      artifact_git_commit:
+      git_commit:
         description: "Artifact commit (40 chars)"
         required: true
         type: string
-      artifact_commit_url:
+      commit_url:
         description: "Artifact commit URL"
         required: true
         type: string
@@ -108,7 +108,7 @@ jobs:
 
       - name: Simulate running snyk and extracting json from sarif file
         run:
-          cp snyk-${{ inputs.artifact_repo_name }}.json snyk-ids.json
+          cp snyk-${{ inputs.repo_name }}.json snyk-ids.json
 
       - name: Merge artifact json into each snyk vuln json
         run: |
@@ -116,9 +116,9 @@ jobs:
             --compact-output \
             --arg artifact_name        "${{ inputs.artifact_name        }}" \
             --arg artifact_fingerprint "${{ inputs.artifact_fingerprint }}" \
-            --arg artifact_repo_name   "${{ inputs.artifact_repo_name   }}" \
-            --arg artifact_git_commit  "${{ inputs.artifact_git_commit  }}" \
-            --arg artifact_commit_url  "${{ inputs.artifact_commit_url  }}" \
+            --arg repo_name            "${{ inputs.repo_name            }}" \
+            --arg git_commit           "${{ inputs.git_commit           }}" \
+            --arg commit_url           "${{ inputs.commit_url           }}" \
             --arg raw_snyk_file_url    "${{ inputs.raw_snyk_file_url    }}" \
             --arg kosli_env            "${{ inputs.kosli_env            }}" \
             --arg kosli_flow           "${{ inputs.kosli_flow           }}" \
@@ -178,9 +178,9 @@ jobs:
         run: |
           echo ${{ matrix.artifact_name }}
           echo ${{ matrix.artifact_fingerprint }}
-          echo ${{ matrix.artifact_repo_name }}
-          echo ${{ matrix.artifact_git_commit }}
-          echo ${{ matrix.artifact_commit_url }}
+          echo ${{ matrix.repo_name }}
+          echo ${{ matrix.git_commit }}
+          echo ${{ matrix.commit_url }}
           echo ${{ matrix.raw_snyk_file_url }}
           echo ${{ matrix.kosli_env }}
           echo ${{ matrix.kosli_flow }}
