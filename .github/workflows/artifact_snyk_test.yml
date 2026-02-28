@@ -85,13 +85,13 @@ jobs:
       - id: set-vulns
         run: |
           cat */vulns | jq --compact-output --slurp add > all-vulns
-          vulns="$(jq \
-            --compact-output \
-            'map(. | \
-              select(.artifact_fingerprint == "${{ inputs.artifact_fingerprint }}" and \
-                     .kosli_env            == "${{ inputs.kosli_env }}" \
-                    ) \
-                )' \
+          vulns="$(jq
+            --compact-output
+            'map(. |
+              select(.artifact_fingerprint == "${{ inputs.artifact_fingerprint }}" and
+                     .kosli_env            == "${{ inputs.kosli_env }}"
+                    )
+                )'
             all-vulns)"
           echo "vulns=${vulns}" >> $GITHUB_OUTPUT
 

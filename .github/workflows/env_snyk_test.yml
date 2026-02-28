@@ -1,5 +1,4 @@
 name: Environment Snyk Test
-# https://stackoverflow.com/questions/78915275/how-can-i-capture-the-results-of-matrix-jobs-in-a-github-actions-workflow
 
 on:
   workflow_call:
