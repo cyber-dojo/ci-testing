@@ -80,35 +80,37 @@ jobs:
         run:
           echo '' > "${SNYK_POLICY_FILENAME}"
 
-      # - name: Run Snyk container test
-      #   env:
-      #     ARTIFACT_NAME: ${{ inputs.artifact_name }}
-      #     SNYK_TOKEN:    ${{ secrets.snyk_token }}
-      #     SNYK_ORG_ID:   ${{ secrets.snyk_org_id }}
-      #   run:
-      #     snyk container test "${ARTIFACT_NAME}"
-      #       --org="${SNYK_ORG_ID}"
-      #       --policy-path="${SNYK_POLICY_FILENAME}"
-      #       --sarif
-      #       --sarif-file-output="${SNYK_SARIF_FILENAME}"
+      - name: Run Snyk container test
+        env:
+          ARTIFACT_NAME: ${{ inputs.artifact_name }}
+          SNYK_TOKEN:    ${{ secrets.snyk_token }}
+          SNYK_ORG_ID:   ${{ secrets.snyk_org_id }}
+        run:
+          snyk container test "${ARTIFACT_NAME}"
+            --org="${SNYK_ORG_ID}"
+            --policy-path="${SNYK_POLICY_FILENAME}"
+            --sarif
+            --sarif-file-output="${SNYK_SARIF_FILENAME}"
 
-      # - name: Fail if the sarif file is not created
-      #   run: |
-      #     if ! test -f "${SNYK_SARIF_FILENAME}" ; then
-      #       echo "ERROR: ${SNYK_SARIF_FILENAME} was not created"
-      #       exit 43
-      #     fi
+      - name: Fail if the sarif file is not created
+        run: |
+          if ! test -f "${SNYK_SARIF_FILENAME}" ; then
+            echo "ERROR: ${SNYK_SARIF_FILENAME} was not created"
+            exit 43
+          fi
 
       - name: Get the real .snyk file
         run: |
           curl "${{ inputs.raw_snyk_file_url }}" > "${SNYK_POLICY_FILENAME}"
           cat "${SNYK_POLICY_FILENAME}"
 
-      # TODO: Real implementation will use filter_sarif.py 
-
-      - name: Simulate running snyk and extracting json from sarif file
+      - name: Combine vulns in sarif and snyk policy file info
         run:
-          cp snyk-${{ inputs.repo_name }}.json snyk-ids.json
+          ./bin/filter_sarif.py "${SNYK_SARIF_FILENAME}" "${SNYK_POLICY_FILENAME}" > snyk-ids.json
+
+      # - name: Simulate running snyk and extracting json from sarif file
+      #   run:
+      #     cp snyk-${{ inputs.repo_name }}.json snyk-ids.json
 
       - name: Merge artifact json into each snyk vuln json
         run: |
@@ -185,5 +187,6 @@ jobs:
           echo ${{ matrix.kosli_env }}
           echo ${{ matrix.kosli_flow }}
           echo ${{ matrix.snyk_id }}
+          echo ${{ matrix.snyk_url }}
           echo ${{ matrix.snyk_severity }}
-
+          echo ${{ matrix.snyk_expires }}

@@ -41,7 +41,16 @@ if __name__ == "__main__":  # pragma: no cover
         if id in vulns:
             vulns[id]['expires'] = ignore[id][0]['*']['expires']
 
-    print(json.dumps(vulns, default=str))
+    flat = []
+    for id, values in vulns.items():
+        flat.append({
+            'snyk_id': id,
+            'snyk_severity': values['severity'],
+            'snyk_url': values['url'],
+            'snyk_expires': values['expires']
+        })
+
+    print(json.dumps(flat, default=str))
 
 
 #   Severity. CVSS v3 Rating
