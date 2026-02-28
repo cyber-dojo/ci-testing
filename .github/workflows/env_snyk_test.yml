@@ -3,8 +3,6 @@ name: Environment Snyk Test
 on:
   workflow_call:
     secrets:
-      snyk_org_id:
-        required: true
       snyk_token:
         required: true
       kosli_api_token:
@@ -71,6 +69,5 @@ jobs:
       kosli_env:            ${{ inputs.kosli_env }}
       kosli_flow:           ${{ inputs.kosli_flow }}
     secrets:
-      snyk_org_id:     ${{ secrets.snyk_org_id }}
       snyk_token:      ${{ secrets.snyk_token }}
       kosli_api_token: ${{ secrets.kosli_api_token }}

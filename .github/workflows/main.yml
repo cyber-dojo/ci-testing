@@ -14,7 +14,6 @@ jobs:
       kosli_env: aws-beta
       kosli_flow: aws-beta-synk-vuln-ages
     secrets:
-      snyk_org_id:     ${{ secrets.SNYK_ORG_ID }}
       snyk_token:      ${{ secrets.SNYK_TOKEN }}
       kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
 
@@ -25,6 +24,5 @@ jobs:
   #     kosli_env: aws-prod
   #     kosli_flow: aws-prod-synk-vuln-ages
   #   secrets:
-  #     snyk_org_id:     ${{ secrets.SNYK_ORG_ID }}
   #     snyk_token:      ${{ secrets.SNYK_TOKEN }}
   #     kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}

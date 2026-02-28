@@ -3,8 +3,6 @@ name: Artifact Snyk Test
 on:
   workflow_call:
     secrets:
-      snyk_org_id:
-        required: true
       snyk_token:
         required: true
       kosli_api_token:
@@ -56,6 +54,9 @@ env:
 jobs:
   find-snyk-vulns:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
     env:
       SNYK_SARIF_FILENAME: snyk.container.test.json
       SNYK_POLICY_FILENAME: .snyk
@@ -63,6 +64,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: Load docker image from registry
+        uses: cyber-dojo/load-image-from-registry@main
+        with:
+          image_name: "${{ inputs.artifact_name }}"
+          aws_rolename: "gh_actions_live_snyk_scans"
 
       - name: Setup Snyk
         uses: snyk/actions/setup@master
@@ -82,12 +89,9 @@ jobs:
 
       - name: Run Snyk container test
         env:
-          ARTIFACT_NAME: ${{ inputs.artifact_name }}
-          SNYK_TOKEN:    ${{ secrets.snyk_token }}
-          SNYK_ORG_ID:   ${{ secrets.snyk_org_id }}
+          SNYK_TOKEN: ${{ secrets.snyk_token }}
         run:
-          snyk container test "${ARTIFACT_NAME}"
-            --org="${SNYK_ORG_ID}"
+          snyk container test "${{ inputs.artifact_name }}"
             --policy-path="${SNYK_POLICY_FILENAME}"
             --sarif
             --sarif-file-output="${SNYK_SARIF_FILENAME}"
