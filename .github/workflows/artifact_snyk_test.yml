@@ -87,9 +87,9 @@ jobs:
           cat */vulns | jq --compact-output --slurp add > all-vulns
 
           filter=""
-          filter="${filter} .artifact_fingerprint == ${{ inputs.artifact_fingerprint }}"
+          filter="${filter} .artifact_fingerprint == \"${{ inputs.artifact_fingerprint }}\""
           filter="${filter} and "
-          filter="${filter} .kosli_env            == ${{ inputs.kosli_env }}"
+          filter="${filter} .kosli_env            == \"${{ inputs.kosli_env }}\""
 
           filter="map(. | select(${filter}))"
           filter="'${filter}'"
