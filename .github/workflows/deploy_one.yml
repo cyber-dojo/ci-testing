@@ -61,8 +61,6 @@ jobs:
           echo "KOSLI_TRAIL=${kosli_trail}" >> ${GITHUB_ENV}
 
       - name: Debug Print 
-        env:
-          KOSLI_TRAIL: ${{ env.KOSLI_TRAIL }}
         run: |
           echo "KOSLI_TRAIL=:${KOSLI_TRAIL}:"
           echo "SERVICE=:${{ inputs.service }}:"
