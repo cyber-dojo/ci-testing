@@ -8,6 +8,7 @@ on:
         type: choice
         required: true
         options:
+          - CHOOSE-ONE-FROM-THE-LIST
           - creator
           - custom-start-points
           - dashboard
