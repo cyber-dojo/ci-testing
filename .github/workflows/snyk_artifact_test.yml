@@ -94,20 +94,22 @@ jobs:
       #       exit 43
       #     fi
 
-      # - name: Get vulns from sarif file
-      #   run:
-      #     ./bin/filter_sarif.py "${SNYK_SARIF_FILENAME}" > snyk-ids.json
+      # - name: Extract snyk vulns into JSON list
+      #   id: set-vulns
+      #   env:
+      #     JSON_FILENAME: vulns.json
+      #   run: |
+      #     ./bin/filter_sarif.py ${SNYK_SARIF_FILENAME} > ${JSON_FILENAME}                  
+      #     vulns="$(jq --compact-output . ${JSON_FILENAME})"
+      #     jq . <<< "${vulns}"
+      #     echo "vulns=${vulns}" >> ${GITHUB_OUTPUT}
 
       - name: Fake running snyk and extracting json from sarif file
-        run:
-          cp snyk-${{ inputs.repo_name }}.json snyk-ids.json
-
-      - name: Extract snyk vulns into JSON list
         id: set-vulns
         env:
           JSON_FILENAME: vulns.json
         run: |
-          ./bin/filter_sarif.py ${SNYK_SARIF_FILENAME} > ${JSON_FILENAME}                  
+          cp snyk-${{ inputs.repo_name }}.json ${JSON_FILENAME}
           vulns="$(jq --compact-output . ${JSON_FILENAME})"
           jq . <<< "${vulns}"
           echo "vulns=${vulns}" >> ${GITHUB_OUTPUT}
