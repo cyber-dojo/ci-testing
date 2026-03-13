@@ -13,15 +13,33 @@ env:
   KOSLI_HOST:      ${{ vars.KOSLI_HOST }}           # https://app.kosli.com
   KOSLI_ORG:       ${{ vars.KOSLI_ORG }}            # cyber-dojo
 
-
 jobs:
   setup:
     needs: []
     runs-on: ubuntu-latest
     outputs:
-      current_beta_trail: ${{ steps.set-current-beta-trail.outputs.current_beta_trail }}
-      current_prod_trail: ${{ steps.set-current-prod-trail.outputs.current_prod_trail }}
-      next_trail: ${{ steps.set-next-trail.outputs.next_trail }}
+      kosli_trail: ${{ steps.set-kosli-trail.outputs.kosli_trail }}
+    steps:
+      - name: Output kosli-trail
+        id: set-kosli-trail
+        run:
+          echo "kolsi_trail=$(date +%Y-%m-%dT%H:%M:%S)" >> ${GITHUB_OUTPUT}
+
+
+  aws-beta-snyk-scan:
+    needs: [setup]
+    uses: ./.github/workflows/snyk_env_test.yml
+    with:
+      kosli_env:   aws-beta
+      kosli_trail: ${{ needs.setup.outputs.kosli_trail }}
+    secrets:
+      snyk_token:      ${{ secrets.SNYK_TOKEN }}
+      kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
+
+
+  aws-beta-new-snyk-vulms:
+    needs: [aws-beta-snyk-scan]
+    runs-on: ubuntu-latest
     steps:
       - name: Setup Kosli CLI
         uses: kosli-dev/setup-cli-action@v2
@@ -41,43 +59,30 @@ jobs:
           current_beta_trail="$(jq --raw-output '.data[0].name' ${JSON_FILENAME})"
           echo current_beta_trail="${current_beta_trail}" >> ${GITHUB_OUTPUT}
 
-      - name: Find most recent Trail in Flow: aws-prod-all-snyk-vulns 
-        id: set-current-prod-trail
-        env:
-          KOSLI_FLOW:    aws-prod-all-snyk-vulns
-          JSON_FILENAME: trail.json
-        run: |
-          kosli list trails \
-            --output=json \
-            --page=1 \
-            --page-limit=1 > ${JSON_FILENAME}
-          current_prod_trail="$(jq --raw-output '.data[0].name' ${JSON_FILENAME})"
-          echo current_prod_trail="${current_prod_trail}" >> ${GITHUB_OUTPUT}
-
-      - name: Output next-trail
-        id: set-next-trail
-        run:
-          echo "next_trail=$(date +%Y-%m-%dT%H:%M:%S)" >> ${GITHUB_OUTPUT}
 
 
-  trigger-aws-beta:
-    needs: [setup]
-    uses: ./.github/workflows/snyk_env_test.yml
-    with:
-      kosli_env:     aws-beta
-      current_trail: ${{ needs.setup.outputs.current_beta_trail }}
-      next_trail:    ${{ needs.setup.outputs.next_trail }}
-    secrets:
-      snyk_token:      ${{ secrets.SNYK_TOKEN }}
-      kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
 
   # trigger-aws-prod:
   #   needs: [setup]
   #   uses: ./.github/workflows/env_snyk_test.yml
   #   with:
-  #     kosli_env:     aws-prod
-  #     current_trail: ${{ needs.setup.outputs.current_beta_trail }}
-  #     next_trail:    ${{ needs.setup.outputs.next_trail }}
+  #     kosli_env:   aws-prod
+  #     kosli_trail: ${{ needs.setup.outputs.kosli_trail }}
   #   secrets:
   #     snyk_token:      ${{ secrets.SNYK_TOKEN }}
   #     kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
+
+
+# TODO: we need a job that runs after all artifacts for ENV have finished
+# attesting to 
+#      KOSLI_FLOW: ${{ inputs.kosli_env }}-all-snyk-vulns
+#      KOSLI_TRAIL: ${{ inputs.next_trail }}
+# and compares two trails to find new-vulns
+# which are then attested to:
+#      KOSLI_FLOW: ${{ inputs.kosli_env }}-new-snyk-vulns
+#      KOSLI_TRAIL: ${{ inputs.repo_name }}-${{ inputs.kosli_fingerprint }}
+# Needs to run twice, once for aws-beta and once for aws-prod
+# It can use the next_trail and compare that with the most recent Trail name.
+
+#      current_beta_trail: ${{ steps.set-current-beta-trail.outputs.current_beta_trail }}
+#      current_prod_trail: ${{ steps.set-current-prod-trail.outputs.current_prod_trail }}

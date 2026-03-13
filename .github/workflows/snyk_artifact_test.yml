@@ -33,11 +33,7 @@ on:
         description: "Name of Kosli environment the artifact is running in"
         required: true
         type: string
-      current_trail:
-        description: "The name of the most recent existing Trail holding attestations for all known snyk vulns in the given Env"
-        required: true
-        type: string
-      next_trail:
+      kosli_trail:
         description: "The name of the new Trail to create holding attestations for all snyk vulns in the given Env"
         required: true
         type: string
@@ -63,7 +59,7 @@ jobs:
       SNYK_SARIF_FILENAME: snyk.container.test.json
       SNYK_POLICY_FILENAME: .snyk
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -121,17 +117,17 @@ jobs:
         run:
           echo "version=$(snyk --version)" >> ${GITHUB_OUTPUT}
 
-  no-new-snyk-vulns:
+  no-snyk-vulns:
     needs: find-all-snyk-vulns
     if: ${{ needs.find-all-snyk-vulns.outputs.vulns == '[]' }}
     runs-on: ubuntu-latest
     env:
       ATTESTATION_DATA_FILENAME: custom.json
       KOSLI_API_TOKEN: ${{ secrets.kosli_api_token }}
-      KOSLI_FLOW: ${{ inputs.kosli_env }}-new-snyk-vulns
-      KOSLI_TRAIL: ${{ inputs.repo_name }}-${{ inputs.kosli_fingerprint }}
+      KOSLI_FLOW: ${{ inputs.kosli_env }}-all-snyk-vulns
+      KOSLI_TRAIL: ${{ inputs.kosli_trail }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -166,7 +162,7 @@ jobs:
             --name artifact.none-SNYK
 
 
-  some-new-snyk-vulns:
+  some-snyk-vulns:
     needs: find-all-snyk-vulns
     if: ${{ needs.find-all-snyk-vulns.outputs.vulns != '[]' }}
     runs-on: ubuntu-latest
@@ -174,12 +170,12 @@ jobs:
       ATTESTATION_DATA_FILENAME: custom.json
       KOSLI_API_TOKEN: ${{ secrets.kosli_api_token }}
       KOSLI_FLOW: ${{ inputs.kosli_env }}-all-snyk-vulns
-      KOSLI_TRAIL: ${{ inputs.next_trail }}
+      KOSLI_TRAIL: ${{ inputs.kosli_trail }}
     strategy:
       matrix:
         include: ${{ fromJSON(needs.find-all-snyk-vulns.outputs.vulns) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 

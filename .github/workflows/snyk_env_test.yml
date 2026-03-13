@@ -13,11 +13,7 @@ on:
         description: "Name of Kosli environment to snyk test"
         required: true
         type: string
-      current_trail:
-        description: "The name of the most recent existing Trail holding attestations for all known snyk vulns in the given Env"
-        required: true
-        type: string
-      next_trail:
+      kosli_trail:
         description: "The name of the new Trail to create holding the new most recent attestation for all snyk vulns in the given Env"
         required: true
         type: string
@@ -36,7 +32,7 @@ jobs:
     outputs:
       artifacts: ${{ steps.set-artifacts.outputs.artifacts }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -45,7 +41,7 @@ jobs:
         with:
           version: ${{ vars.KOSLI_CLI_VERSION }}
 
-      # - name: Generate JSON for each Artifact in KOSLI_ENV for following job's strategy:matrix:include
+      # - name: Generate JSON for each Artifact in kosli_env for following job's strategy:matrix:include
       # - id: set-artifacts
       #   run: |
       #     echo "artifacts=$(make artifacts | jq --raw-output --compact-output .)" >> ${GITHUB_OUTPUT}
@@ -69,18 +65,8 @@ jobs:
       git_commit:           ${{ matrix.git_commit }}
       commit_url:           ${{ matrix.commit_url }}
       kosli_env:            ${{ inputs.kosli_env }}
-      current_trail:        ${{ inputs.current_trail }}
-      next_trail:           ${{ inputs.next_trail }}
+      kosli_trail:          ${{ inputs.kosli_trail }}
     secrets:
       snyk_token:      ${{ secrets.snyk_token }}
       kosli_api_token: ${{ secrets.kosli_api_token }}
 
-
-# TODO: we need a job that runs after all artifacts for ENV have finished
-#. attesting to 
-#      KOSLI_FLOW: ${{ inputs.kosli_env }}-all-snyk-vulns
-#      KOSLI_TRAIL: ${{ inputs.date_time }}
-# and compares two trails to find new-vulns
-# which are then attested to:
-#      KOSLI_FLOW: ${{ inputs.kosli_env }}-new-snyk-vulns
-#      KOSLI_TRAIL: ${{ inputs.repo_name }}-${{ inputs.kosli_fingerprint }}
