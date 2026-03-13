@@ -7,22 +7,55 @@ on:
   #  - cron: '0 8 * * *'
 
 jobs:
-  trigger-aws-beta:
+  setup:
     needs: []
-    uses: ./.github/workflows/env_snyk_test.yml
+    runs-on: ubuntu-latest
+    outputs:
+      current_beta_trail: ${{ steps.set-current-beta-trail.outputs.current_beta_trail }}
+      current_prod_trail: ${{ steps.set-current-prod-trail.outputs.current_prod_trail }}
+      next_trail: ${{ steps.set-next-trail.outputs.next_trail }}
+    steps:
+      - name: Find most recent Trail in Flow: aws-beta-all-snyk-vulns
+        id: set-current-beta-trail
+        run: |
+          current_beta_trail="$(TODO)"
+          echo current_beta_trail="${current_beta_trail}" >> ${GITHUB_OUTPUT}
+
+      - name: Setup Kosli CLI
+        uses: kosli-dev/setup-cli-action@v2
+        with:
+          version: ${{ vars.KOSLI_CLI_VERSION }}
+
+      - name: Find most recent Trail in Flow: aws-prod-all-snyk-vulns 
+        id: set-current-prod-trail
+        run: |
+          current_prod_trail="$(TODO)"
+          echo current_prod_trail="${current_prod_trail}" >> ${GITHUB_OUTPUT}
+
+      - name: Output next-trail
+        id: set-next-trail
+        run:
+          echo "next_trail=$(date +%Y-%m-%dT%H:%M:%S)" >> ${GITHUB_OUTPUT}
+
+
+  trigger-aws-beta:
+    needs: [setup]
+    uses: ./.github/workflows/snyk_env_test.yml
     with:
       kosli_env: aws-beta
-      kosli_flow: aws-beta-synk-vuln-ages
+      current_trail: ${{ needs.setup.outputs.current_beta_trail }}
+      next_trail: ${{ needs.setup.outputs.next_trail }}
     secrets:
       snyk_token:      ${{ secrets.SNYK_TOKEN }}
       kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
 
   # trigger-aws-prod:
-  #   needs: []
+  #   needs: [setup]
   #   uses: ./.github/workflows/env_snyk_test.yml
   #   with:
   #     kosli_env: aws-prod
-  #     kosli_flow: aws-prod-synk-vuln-ages
+  #     current_trail: ${{ needs.setup.outputs.current_beta_trail }}
+  #     next_trail: ${{ needs.setup.outputs.next_trail }}
   #   secrets:
   #     snyk_token:      ${{ secrets.SNYK_TOKEN }}
   #     kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
