@@ -6,6 +6,14 @@ on:
   #schedule: # At 08:00 every day
   #  - cron: '0 8 * * *'
 
+env:
+  KOSLI_API_TOKEN: ${{ secrets.kosli_api_token }}
+  KOSLI_DEBUG:     ${{ vars.KOSLI_DEBUG }}          # true/false
+  KOSLI_DRY_RUN:   true # ${{ vars.KOSLI_DRY_RUN }}        # true/false
+  KOSLI_HOST:      ${{ vars.KOSLI_HOST }}           # https://app.kosli.com
+  KOSLI_ORG:       ${{ vars.KOSLI_ORG }}            # cyber-dojo
+
+
 jobs:
   setup:
     needs: []
@@ -15,21 +23,35 @@ jobs:
       current_prod_trail: ${{ steps.set-current-prod-trail.outputs.current_prod_trail }}
       next_trail: ${{ steps.set-next-trail.outputs.next_trail }}
     steps:
-      - name: Find most recent Trail in Flow: aws-beta-all-snyk-vulns
-        id: set-current-beta-trail
-        run: |
-          current_beta_trail="$(TODO)"
-          echo current_beta_trail="${current_beta_trail}" >> ${GITHUB_OUTPUT}
-
       - name: Setup Kosli CLI
         uses: kosli-dev/setup-cli-action@v2
         with:
           version: ${{ vars.KOSLI_CLI_VERSION }}
 
+      - name: Find most recent Trail in Flow: aws-beta-all-snyk-vulns
+        id: set-current-beta-trail
+        env:
+          KOSLI_FLOW:    aws-beta-all-snyk-vulns
+          JSON_FILENAME: trail.json
+        run: |
+          kosli list trails \
+            --output=json \
+            --page=1 \
+            --page-limit=1 > ${JSON_FILENAME}
+          current_beta_trail="$(jq --raw-output '.data[0].name' ${JSON_FILENAME})"
+          echo current_beta_trail="${current_beta_trail}" >> ${GITHUB_OUTPUT}
+
       - name: Find most recent Trail in Flow: aws-prod-all-snyk-vulns 
         id: set-current-prod-trail
+        env:
+          KOSLI_FLOW:    aws-prod-all-snyk-vulns
+          JSON_FILENAME: trail.json
         run: |
-          current_prod_trail="$(TODO)"
+          kosli list trails \
+            --output=json \
+            --page=1 \
+            --page-limit=1 > ${JSON_FILENAME}
+          current_prod_trail="$(jq --raw-output '.data[0].name' ${JSON_FILENAME})"
           echo current_prod_trail="${current_prod_trail}" >> ${GITHUB_OUTPUT}
 
       - name: Output next-trail
@@ -42,9 +64,9 @@ jobs:
     needs: [setup]
     uses: ./.github/workflows/snyk_env_test.yml
     with:
-      kosli_env: aws-beta
+      kosli_env:     aws-beta
       current_trail: ${{ needs.setup.outputs.current_beta_trail }}
-      next_trail: ${{ needs.setup.outputs.next_trail }}
+      next_trail:    ${{ needs.setup.outputs.next_trail }}
     secrets:
       snyk_token:      ${{ secrets.SNYK_TOKEN }}
       kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
@@ -53,9 +75,9 @@ jobs:
   #   needs: [setup]
   #   uses: ./.github/workflows/env_snyk_test.yml
   #   with:
-  #     kosli_env: aws-prod
+  #     kosli_env:     aws-prod
   #     current_trail: ${{ needs.setup.outputs.current_beta_trail }}
-  #     next_trail: ${{ needs.setup.outputs.next_trail }}
+  #     next_trail:    ${{ needs.setup.outputs.next_trail }}
   #   secrets:
   #     snyk_token:      ${{ secrets.SNYK_TOKEN }}
   #     kosli_api_token: ${{ secrets.KOSLI_API_TOKEN }}
