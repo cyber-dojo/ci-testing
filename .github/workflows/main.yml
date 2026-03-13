@@ -49,7 +49,7 @@ jobs:
         with:
           version: ${{ vars.KOSLI_CLI_VERSION }}
 
-      - name: Find most recent Trails in Flow: aws-beta-all-snyk-vulns
+      - name: Find most recent Trails in Flow aws-beta-all-snyk-vulns
         id: set-trail-names
         env:
           KOSLI_FLOW:    aws-beta-all-snyk-vulns
