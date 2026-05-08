@@ -1,0 +1,31 @@
+name: Confirm begin-trail git-repo requirement
+
+on:
+  workflow_dispatch:
+
+env:
+  KOSLI_API_TOKEN: ${{ secrets.kosli_api_token }}
+  KOSLI_HOST:      ${{ vars.KOSLI_HOST }}
+  KOSLI_ORG:       ${{ vars.KOSLI_ORG }}
+
+jobs:
+  without-checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kosli-dev/setup-cli-action@v3
+        with:
+          version: ${{ vars.KOSLI_CLI_VERSION }}
+      - name: begin trail WITHOUT checkout (expect failure)
+        run: kosli begin trail test-trail --flow test-flow --dry-run
+
+  with-checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: kosli-dev/setup-cli-action@v3
+        with:
+          version: ${{ vars.KOSLI_CLI_VERSION }}
+      - name: begin trail WITH checkout (expect success)
+        run: kosli begin trail test-trail --flow test-flow --dry-run
